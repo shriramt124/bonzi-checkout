@@ -13,3 +13,54 @@ button:focus {
 button {
   transition: background-color 0.2s ease;
 }
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .text-lg {
+    font-size: 1rem;
+  }
+  
+  .text-md {
+    font-size: 0.9rem;
+  }
+  
+  .text-sm {
+    font-size: 0.8rem;
+  }
+  
+  .p-6 {
+    padding: 1rem;
+  }
+  
+  .p-4 {
+    padding: 0.75rem;
+  }
+  
+  .w-16 {
+    width: 3rem;
+  }
+  
+  .h-16 {
+    height: 3rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 380px) {
+  .px-4 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .p-3 {
+    padding: 0.5rem;
+  }
+  
+  .gap-4 {
+    gap: 0.5rem;
+  }
+  
+  .text-xl {
+    font-size: 1.1rem;
+  }
+}

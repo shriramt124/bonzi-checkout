@@ -24,6 +24,11 @@ function App() {
     cardholderName: '',
     promoCode: ''
   })
+  
+  const [couponCode, setCouponCode] = useState('')
+  const [couponApplied, setCouponApplied] = useState(false)
+  const [couponDiscount, setCouponDiscount] = useState(0)
+  const [showOrderSummary, setShowOrderSummary] = useState(false)
 
   const cartItems = [
     {
@@ -48,9 +53,38 @@ function App() {
   const shipping = 9.99
   const tax = subtotal * 0.08
   const platformFee = 3.99
-  const total = subtotal + shipping + tax + platformFee
+  const discount = couponApplied ? couponDiscount : 0
+  const total = subtotal + shipping + tax + platformFee - discount
   const isFreeShipping = Math.abs(shipping) < 0.01
-  const totalSavings = cartItems.reduce((sum, item) => sum + ((item.originalPrice - item.price) * item.quantity), 0)
+  const totalSavings = cartItems.reduce((sum, item) => sum + ((item.originalPrice - item.price) * item.quantity), 0) + discount
+  
+  const applyCoupon = () => {
+    if (!couponCode) return
+    
+    // Simple coupon logic - in real app this would validate against a database
+    if (couponCode.toUpperCase() === 'SAVE10') {
+      setCouponDiscount(subtotal * 0.1) // 10% discount
+      setCouponApplied(true)
+    } else if (couponCode.toUpperCase() === 'FREESHIP') {
+      setCouponDiscount(shipping) // Free shipping
+      setCouponApplied(true)
+    } else if (couponCode.toUpperCase() === 'BONZI25') {
+      setCouponDiscount(25) // $25 off
+      setCouponApplied(true)
+    } else {
+      alert('Invalid coupon code')
+    }
+  }
+  
+  const removeCoupon = () => {
+    setCouponCode('')
+    setCouponDiscount(0)
+    setCouponApplied(false)
+  }
+  
+  const toggleOrderSummary = () => {
+    setShowOrderSummary(!showOrderSummary)
+  }
 
   // Validation functions
   const validateStep = (step: number): boolean => {
@@ -190,6 +224,65 @@ function App() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Mobile Order Summary Toggle */}
+        <div className="lg:hidden mb-4">
+          <button 
+            onClick={toggleOrderSummary}
+            className="w-full p-3 bg-blue-50 border border-blue-200 rounded flex justify-between items-center"
+          >
+            <span className="font-medium">
+              {showOrderSummary ? 'Hide Order Summary' : 'Show Order Summary'}
+            </span>
+            <span className="font-medium">${total.toFixed(2)}</span>
+          </button>
+        </div>
+        
+        {/* Mobile Order Summary (Collapsible) */}
+        {showOrderSummary && (
+          <div className="lg:hidden mb-4 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-medium text-gray-800 mb-3">ORDER SUMMARY</h3>
+            <div className="border-t border-gray-200 pt-3">
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex py-3 border-b border-gray-100">
+                  <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
+                    <span className="text-2xl">📦</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm">{item.name}</div>
+                    <div className="flex items-center text-sm mt-1">
+                      <span className="text-gray-800 font-medium">${item.price.toFixed(2)}</span>
+                      <span className="text-gray-500 line-through text-xs ml-2">${item.originalPrice.toFixed(2)}</span>
+                      <span className="text-green-600 text-xs ml-2">
+                        {Math.round((1 - item.price/item.originalPrice) * 100)}% off
+                      </span>
+                    </div>
+                    <div className="flex items-center mt-2">
+                      <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal:</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+                {couponApplied && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount:</span>
+                    <span>-${couponDiscount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm mt-1">
+                  <span>Total:</span>
+                  <span className="font-medium">${total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Column - Checkout Process */}
           <div className="w-full lg:w-2/3">
@@ -624,6 +717,46 @@ function App() {
               </div>
             )}
 
+            {/* Mobile Coupon Code */}
+            <div className="lg:hidden bg-white p-4 shadow-sm mb-4">
+              <h3 className="text-md font-medium text-gray-800 mb-3">APPLY COUPON</h3>
+              <div className="border-t border-gray-200 pt-3">
+                {!couponApplied ? (
+                  <div className="flex">
+                    <input
+                      type="text"
+                      placeholder="Enter coupon code"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className="flex-1 p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={applyCoupon}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+                    >
+                      APPLY
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between bg-green-50 p-3 rounded">
+                    <div>
+                      <div className="text-green-700 font-medium">{couponCode.toUpperCase()}</div>
+                      <div className="text-green-600 text-sm">${couponDiscount.toFixed(2)} discount applied</div>
+                    </div>
+                    <button 
+                      onClick={removeCoupon}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                <div className="text-xs text-gray-500 mt-2">
+                  Try: SAVE10, FREESHIP, BONZI25
+                </div>
+              </div>
+            </div>
+            
             {/* Order Confirmation Email */}
             {currentStep === 3 && (
               <div className="bg-white p-4 shadow-sm text-sm text-gray-600">
@@ -633,7 +766,48 @@ function App() {
           </div>
 
           {/* Right Column - Order Summary */}
-          <div className="w-full lg:w-1/3">
+          <div className="w-full lg:w-1/3 hidden lg:block">
+            {/* Coupon Code Section */}
+            <div className="bg-white p-4 shadow-sm mb-4">
+              <h3 className="text-md font-medium text-gray-800 mb-3">APPLY COUPON</h3>
+              <div className="border-t border-gray-200 pt-3">
+                {!couponApplied ? (
+                  <div className="flex">
+                    <input
+                      type="text"
+                      placeholder="Enter coupon code"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className="flex-1 p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={applyCoupon}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+                    >
+                      APPLY
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between bg-green-50 p-3 rounded">
+                    <div>
+                      <div className="text-green-700 font-medium">{couponCode.toUpperCase()}</div>
+                      <div className="text-green-600 text-sm">${couponDiscount.toFixed(2)} discount applied</div>
+                    </div>
+                    <button 
+                      onClick={removeCoupon}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                <div className="text-xs text-gray-500 mt-2">
+                  Try: SAVE10, FREESHIP, BONZI25
+                </div>
+              </div>
+            </div>
+
+            {/* Price Details */}
             <div className="bg-white p-4 shadow-sm mb-4">
               <h3 className="text-lg font-medium text-gray-800 mb-3">PRICE DETAILS</h3>
               <div className="border-t border-gray-200 pt-3 space-y-3">
@@ -651,6 +825,12 @@ function App() {
                   <span>Platform Fee</span>
                   <span>${platformFee.toFixed(2)}</span>
                 </div>
+                {couponApplied && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Coupon Discount</span>
+                    <span>-${couponDiscount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="border-t border-gray-200 pt-3 font-medium flex justify-between">
                   <span>Total Payable</span>
                   <span>${total.toFixed(2)}</span>
@@ -661,34 +841,32 @@ function App() {
               </div>
             </div>
 
-            {/* Order Items */}
-            {(currentStep === 3) && (
-              <div className="bg-white p-4 shadow-sm mb-4">
-                <h3 className="text-lg font-medium text-gray-800 mb-3">ORDER SUMMARY</h3>
-                <div className="border-t border-gray-200 pt-3">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex py-3 border-b border-gray-100">
-                      <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
-                        <span className="text-2xl">📦</span>
+            {/* Order Items - Show on all steps */}
+            <div className="bg-white p-4 shadow-sm mb-4">
+              <h3 className="text-lg font-medium text-gray-800 mb-3">ORDER SUMMARY</h3>
+              <div className="border-t border-gray-200 pt-3">
+                {cartItems.map((item) => (
+                  <div key={item.id} className="flex py-3 border-b border-gray-100">
+                    <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
+                      <span className="text-2xl">📦</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm">{item.name}</div>
+                      <div className="flex items-center text-sm mt-1">
+                        <span className="text-gray-800 font-medium">${item.price.toFixed(2)}</span>
+                        <span className="text-gray-500 line-through text-xs ml-2">${item.originalPrice.toFixed(2)}</span>
+                        <span className="text-green-600 text-xs ml-2">
+                          {Math.round((1 - item.price/item.originalPrice) * 100)}% off
+                        </span>
                       </div>
-                      <div className="flex-1">
-                        <div className="text-sm">{item.name}</div>
-                        <div className="flex items-center text-sm mt-1">
-                          <span className="text-gray-800 font-medium">${item.price.toFixed(2)}</span>
-                          <span className="text-gray-500 line-through text-xs ml-2">${item.originalPrice.toFixed(2)}</span>
-                          <span className="text-green-600 text-xs ml-2">
-                            {Math.round((1 - item.price/item.originalPrice) * 100)}% off
-                          </span>
-                        </div>
-                        <div className="flex items-center mt-2">
-                          <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
-                        </div>
+                      <div className="flex items-center mt-2">
+                        <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
 
             {/* Security Notice */}
             <div className="bg-white p-4 shadow-sm">
