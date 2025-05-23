@@ -1,1 +1,15 @@
- 
+
+/* Minimal styling for the checkout page */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* Remove any specific animations */
+input:focus, 
+button:focus {
+  transition: all 0.2s ease;
+}
+
+button {
+  transition: background-color 0.2s ease;
+}
