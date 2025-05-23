@@ -4,6 +4,82 @@
   min-height: 100vh;
 }
 
+/* Tab styling */
+.tab-btn {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-weight: 500;
+  color: #6b7280;
+  position: relative;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background-color: #e5e7eb;
+  color: #4b5563;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.active-tab {
+  color: #f97316;
+  border-bottom: 2px solid #f97316;
+}
+
+.active-tab .tab-icon {
+  background-color: #f97316;
+  color: white;
+}
+
+.tab-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive tab layout */
+@media (max-width: 640px) {
+  .tab-btn {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .tab-text {
+    font-size: 0.75rem;
+  }
+  
+  .tab-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-text {
+    display: none;
+  }
+  
+  .tab-icon {
+    margin-right: 0;
+  }
+  
+  .tab-btn {
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+}
+
 /* Remove any specific animations */
 input:focus, 
 button:focus {
@@ -90,22 +166,6 @@ button {
     padding-right: 1rem;
   }
   
-  /* Smaller icons */
-  [aria-label] {
-    font-size: 1rem;
-  }
-  
-  /* Smaller step indicators */
-  .w-6, .h-6 {
-    width: 1.3rem;
-    height: 1.3rem;
-  }
-  
-  .w-8, .h-8 {
-    width: 1.8rem;
-    height: 1.8rem;
-  }
-  
   /* Make coupon code inputs and buttons more compact */
   .flex-1 {
     min-width: 0;
@@ -114,12 +174,6 @@ button {
   /* Better wrapping for order items */
   .flex-wrap {
     flex-wrap: wrap;
-  }
-  
-  /* Vertical checkout progress */
-  .space-y-3 > * {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
   }
   
   /* Make buttons more touch-friendly */
@@ -148,15 +202,6 @@ button {
   
   .text-xs {
     font-size: 0.65rem;
-  }
-  
-  .w-6, .h-6 {
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-  
-  [aria-label] {
-    font-size: 0.9rem;
   }
   
   .py-2 {
@@ -227,42 +272,8 @@ button {
   border-color: #f97316;
 }
 
-/* Vertical checkout flow styles */
-.space-y-3 > * + * {
-  margin-top: 0.75rem;
-}
-
-.space-y-4 > * + * {
-  margin-top: 1rem;
-}
-
-/* Step indicator for vertical flow */
-.steps-vertical .step {
-  position: relative;
-}
-
-.steps-vertical .step:not(:last-child):after {
-  content: '';
-  position: absolute;
-  left: 16px;
-  top: 32px;
-  bottom: 0;
-  width: 2px;
-  background-color: #e5e7eb;
-  z-index: 0;
-}
-
-.steps-vertical .step.completed:after {
-  background-color: #22c55e;
-}
-
-.steps-vertical .step.active:after {
-  background-color: #f97316;
-}
-
-/* Animation for step transitions */
-.step-transition {
-  transition: all 0.3s ease;
+.focus\:ring-orange-500:focus {
+  --tw-ring-color: #f97316;
 }
 
 /* Improved focus states for accessibility */
