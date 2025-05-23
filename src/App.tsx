@@ -194,7 +194,7 @@ function App() {
       <div className="flex items-center">
         <div className={`flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium ${
           currentStep === stepNumber 
-          ? 'bg-blue-500 text-white' 
+          ? 'bg-orange-500 text-white' 
           : currentStep > stepNumber 
             ? 'bg-green-500 text-white' 
             : 'bg-gray-200 text-gray-600'
@@ -210,7 +210,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-blue-500 text-white py-3">
+      <header className="bg-orange-500 text-white py-3">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
             <div className="text-xl font-bold">BonziCart</div>
@@ -228,7 +228,7 @@ function App() {
         <div className="lg:hidden mb-4">
           <button 
             onClick={toggleOrderSummary}
-            className="w-full p-3 bg-blue-50 border border-blue-200 rounded flex justify-between items-center"
+            className="w-full p-3 bg-orange-50 border border-orange-200 rounded flex justify-between items-center"
           >
             <span className="font-medium">
               {showOrderSummary ? 'Hide Order Summary' : 'Show Order Summary'}
@@ -361,7 +361,7 @@ function App() {
                   <button
                     onClick={nextStep}
                     disabled={isLoading}
-                    className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+                    className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
                   >
                     {isLoading ? 'Processing...' : 'CONTINUE'}
                   </button>
@@ -567,7 +567,7 @@ function App() {
                   <button
                     onClick={nextStep}
                     disabled={isLoading}
-                    className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+                    className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
                   >
                     {isLoading ? 'Processing...' : 'CONTINUE'}
                   </button>
@@ -771,7 +771,7 @@ function App() {
                     />
                     <button
                       onClick={applyCoupon}
-                      className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+                      className="bg-orange-500 text-white px-4 py-2 rounded-r hover:bg-orange-600"
                     >
                       APPLY
                     </button>
