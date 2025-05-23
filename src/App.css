@@ -182,6 +182,17 @@ button {
   .h-16 {
     height: 3rem;
   }
+  
+  /* Make tab headers more compact */
+  .tab-header {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .tab-number {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.8rem;
+  }
 }
 
 /* Very small screens */
@@ -243,6 +254,36 @@ button {
   button {
     min-height: 2.5rem;
   }
+  
+  /* Optimize mobile tab display */
+  .tab-header {
+    padding: 0.6rem 0.4rem;
+  }
+  
+  .tab-number {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+    margin-right: 0.5rem;
+  }
+  
+  .tab-title {
+    font-size: 0.85rem;
+  }
+  
+  .tab-content {
+    padding: 0.75rem;
+  }
+  
+  .tab-action {
+    font-size: 0.7rem;
+  }
+  
+  /* More compact mobile order summary */
+  .w-16, .h-16 {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
 /* Add a custom extra small breakpoint */
@@ -276,6 +317,79 @@ button {
     padding-left: 0.4rem;
     padding-right: 0.4rem;
   }
+  
+  /* Ultra compact tab display */
+  .tab-header {
+    padding: 0.5rem 0.3rem;
+  }
+  
+  .tab-number {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.7rem;
+    margin-right: 0.4rem;
+  }
+  
+  .tab-title {
+    font-size: 0.75rem;
+  }
+  
+  .tab-content {
+    padding: 0.6rem;
+  }
+  
+  .tab-action {
+    font-size: 0.65rem;
+  }
+  
+  /* Stack labels and inputs in very small screens */
+  label + input, 
+  label + select, 
+  label + textarea {
+    margin-top: 0.2rem;
+  }
+  
+  /* Ultra compact product items */
+  .w-16, .h-16 {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  
+  /* Optimize forms for tiny screens */
+  input, select, textarea, button {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Add subtle transitions for a more polished feel */
+.tab-header,
+button,
+input,
+select {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Improve focus states */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: 2px solid rgba(249, 115, 22, 0.5);
+  outline-offset: 1px;
+}
+
+/* Optimize card display */
+.tab-content.active {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Enhance action buttons */
+button.bg-orange-500 {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+button.bg-orange-500:active {
+  transform: translateY(1px);
 }
 
 /* Orange theme */
