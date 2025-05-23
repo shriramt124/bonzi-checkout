@@ -1,6 +1,3 @@
-I have analyzed the original code and the changes, and I will now generate the complete modified code, incorporating the requested changes to move the coupon code section in the mobile view and enhance responsiveness.
-```
-```replit_final_file
 import { useState } from "react";
 import "./App.css";
 
@@ -234,121 +231,116 @@ function App() {
 
         {/* Mobile Order Summary (Collapsible) */}
         <div className="lg:hidden mb-4 bg-white p-4 shadow-sm">
-              <h3 className="text-lg font-medium text-gray-800 mb-3">
-                ORDER SUMMARY
-              </h3>
-              <div className="border-t border-gray-200 pt-3">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex py-3 border-b border-gray-100"
-                  >
-                    <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
-                      <span className="text-2xl">📦</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm">{item.name}</div>
-                      <div className="flex items-center text-sm mt-1">
-                        <span className="text-gray-800 font-medium">
-                          ${item.price.toFixed(2)}
-                        </span>
-                        <span className="text-gray-500 line-through text-xs ml-2">
-                          ${item.originalPrice.toFixed(2)}
-                        </span>
-                        <span className="text-green-600 text-xs ml-2">
-                          {Math.round(
-                            (1 - item.price / item.originalPrice) * 100,
-                          )}
-                          % off
-                        </span>
-                      </div>
-                      <div className="flex items-center mt-2">
-                        <span className="text-sm text-gray-600">
-                          Qty: {item.quantity}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-              <div className="mt-3 pt-3 border-t border-gray-200">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal:</span>
-                  <span>${subtotal.toFixed(2)}</span>
+          <h3 className="text-lg font-medium text-gray-800 mb-3">
+            ORDER SUMMARY
+          </h3>
+          <div className="border-t border-gray-200 pt-3">
+            {cartItems.map((item) => (
+              <div key={item.id} className="flex py-3 border-b border-gray-100">
+                <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
+                  <span className="text-2xl">📦</span>
                 </div>
-
-                {/* Mobile Coupon Code Section */}
-                <div className="pt-2 mt-2 border-t border-gray-200">
-                  <div className="flex items-center mb-2">
-                    <div className="text-orange-500 mr-2">🏷️</div>
-                    <h3 className="text-sm font-medium text-gray-800">
-                      APPLY COUPON
-                    </h3>
+                <div className="flex-1">
+                  <div className="text-sm">{item.name}</div>
+                  <div className="flex items-center text-sm mt-1">
+                    <span className="text-gray-800 font-medium">
+                      ${item.price.toFixed(2)}
+                    </span>
+                    <span className="text-gray-500 line-through text-xs ml-2">
+                      ${item.originalPrice.toFixed(2)}
+                    </span>
+                    <span className="text-green-600 text-xs ml-2">
+                      {Math.round((1 - item.price / item.originalPrice) * 100)}%
+                      off
+                    </span>
                   </div>
-                  {!couponApplied ? (
-                    <div className="flex">
-                      <input
-                        type="text"
-                        placeholder="Enter coupon code"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        className="flex-1 p-2 text-sm border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-orange-500"
-                      />
-                      <button
-                        onClick={applyCoupon}
-                        className="bg-orange-500 text-white px-3 py-2 text-sm rounded-r hover:bg-orange-600"
-                      >
-                        APPLY
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between bg-green-50 p-2 rounded">
-                      <div>
-                        <div className="text-green-700 font-medium text-sm">
-                          {couponCode.toUpperCase()}
-                        </div>
-                        <div className="text-green-600 text-xs">
-                          ${couponDiscount.toFixed(2)} discount applied
-                        </div>
-                      </div>
-                      <button
-                        onClick={removeCoupon}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
-                  <div className="text-xs text-gray-500 mt-1 mb-2">
-                    Try: SAVE10, FREESHIP, BONZI25
+                  <div className="flex items-center mt-2">
+                    <span className="text-sm text-gray-600">
+                      Qty: {item.quantity}
+                    </span>
                   </div>
                 </div>
+              </div>
+            ))}
 
-                {couponApplied && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Discount:</span>
-                    <span>-${couponDiscount.toFixed(2)}</span>
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <div className="flex justify-between text-sm">
+                <span>Subtotal:</span>
+                <span>${subtotal.toFixed(2)}</span>
+              </div>
+
+              {/* Mobile Coupon Code Section */}
+              <div className="pt-2 mt-2 border-t border-gray-200">
+                <div className="flex items-center mb-2">
+                  <div className="text-orange-500 mr-2">🏷️</div>
+                  <h3 className="text-sm font-medium text-gray-800">
+                    APPLY COUPON
+                  </h3>
+                </div>
+                {!couponApplied ? (
+                  <div className="flex">
+                    <input
+                      type="text"
+                      placeholder="Enter coupon code"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className="flex-1 p-2 text-sm border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-orange-500"
+                    />
+                    <button
+                      onClick={applyCoupon}
+                      className="bg-orange-500 text-white px-3 py-2 text-sm rounded-r hover:bg-orange-600"
+                    >
+                      APPLY
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between bg-green-50 p-2 rounded">
+                    <div>
+                      <div className="text-green-700 font-medium text-sm">
+                        {couponCode.toUpperCase()}
+                      </div>
+                      <div className="text-green-600 text-xs">
+                        ${couponDiscount.toFixed(2)} discount applied
+                      </div>
+                    </div>
+                    <button
+                      onClick={removeCoupon}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      ✕
+                    </button>
                   </div>
                 )}
-                <div className="flex justify-between text-sm mt-1">
-                  <span>Shipping:</span>
-                  <span>${shipping.toFixed(2)}</span>
+                <div className="text-xs text-gray-500 mt-1 mb-2">
+                  Try: SAVE10, FREESHIP, BONZI25
                 </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span>Tax:</span>
-                  <span>${tax.toFixed(2)}</span>
+              </div>
+
+              {couponApplied && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span>Discount:</span>
+                  <span>-${couponDiscount.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span>Platform Fee:</span>
-                  <span>${platformFee.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-medium text-base mt-3 pt-2 border-t border-gray-200">
-                  <span>Total:</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
+              )}
+              <div className="flex justify-between text-sm mt-1">
+                <span>Shipping:</span>
+                <span>${shipping.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm mt-1">
+                <span>Tax:</span>
+                <span>${tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm mt-1">
+                <span>Platform Fee:</span>
+                <span>${platformFee.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between font-medium text-base mt-3 pt-2 border-t border-gray-200">
+                <span>Total:</span>
+                <span>${total.toFixed(2)}</span>
               </div>
             </div>
           </div>
+        </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Column - Checkout Process */}
@@ -844,7 +836,7 @@ function App() {
                           </div>
                         ))}
                       </div>
-
+                      {/* 
                       <div className="mt-4 pt-3 border-t border-gray-200">
                         <div className="flex justify-between text-sm">
                           <span>Subtotal:</span>
@@ -873,53 +865,7 @@ function App() {
                           <span>${total.toFixed(2)}</span>
                         </div>
                       </div>
-
-                      {/* Coupon Code Section */}
-                      <div className="mt-6 pt-4 border-t border-gray-200">
-                        <div className="flex items-center mb-3">
-                          <div className="text-orange-500 mr-2">🏷️</div>
-                          <h3 className="text-md font-medium text-gray-800">
-                            APPLY COUPON
-                          </h3>
-                        </div>
-                        {!couponApplied ? (
-                          <div className="flex">
-                            <input
-                              type="text"
-                              placeholder="Enter coupon code"
-                              value={couponCode}
-                              onChange={(e) => setCouponCode(e.target.value)}
-                              className="flex-1 p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-orange-500"
-                            />
-                            <button
-                              onClick={applyCoupon}
-                              className="bg-orange-500 text-white px-4 py-2 rounded-r hover:bg-orange-600"
-                            >
-                              APPLY
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between bg-green-50 p-3 rounded">
-                            <div>
-                              <div className="text-green-700 font-medium">
-                                {couponCode.toUpperCase()}
-                              </div>
-                              <div className="text-green-600 text-sm">
-                                ${couponDiscount.toFixed(2)} discount applied
-                              </div>
-                            </div>
-                            <button
-                              onClick={removeCoupon}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        )}
-                        <div className="text-xs text-gray-500 mt-2">
-                          Try: SAVE10, FREESHIP, BONZI25
-                        </div>
-                      </div>
+ */}
 
                       <div className="flex justify-between mt-6">
                         <button
@@ -1209,8 +1155,8 @@ function App() {
                   <span>${platformFee.toFixed(2)}</span>
                 </div>
 
-                 {/* Coupon Code Section */}
-                 {!couponApplied ? (
+                {/* Coupon Code Section */}
+                {!couponApplied ? (
                   <div className="flex flex-col mt-2">
                     <input
                       type="text"
@@ -1225,9 +1171,9 @@ function App() {
                     >
                       APPLY
                     </button>
-                     <div className="text-xs text-gray-500 mt-2">
-                     Try: SAVE10, FREESHIP, BONZI25
-                     </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                      Try: SAVE10, FREESHIP, BONZI25
+                    </div>
                   </div>
                 ) : (
                   <div className="flex items-center justify-between bg-green-50 p-3 rounded">
@@ -1329,4 +1275,3 @@ function App() {
 }
 
 export default App;
-</replit_final_file>
