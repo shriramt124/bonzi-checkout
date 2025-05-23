@@ -1,181 +1,203 @@
-import { useState } from 'react'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
 function App() {
-  const [activeTab, setActiveTab] = useState('contact')
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [activeTab, setActiveTab] = useState("contact");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [formData, setFormData] = useState({
-    email: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    address: '',
-    locality: '',
-    city: '',
-    zipCode: '',
-    state: 'California',
-    landmark: '',
-    country: 'United States',
-    paymentMethod: 'card',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardholderName: '',
-    promoCode: ''
-  })
+    email: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    address: "",
+    locality: "",
+    city: "",
+    zipCode: "",
+    state: "California",
+    landmark: "",
+    country: "United States",
+    paymentMethod: "card",
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+    cardholderName: "",
+    promoCode: "",
+  });
 
-  const [couponCode, setCouponCode] = useState('')
-  const [couponApplied, setCouponApplied] = useState(false)
-  const [couponDiscount, setCouponDiscount] = useState(0)
-  const [showOrderSummary, setShowOrderSummary] = useState(false)
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [showOrderSummary, setShowOrderSummary] = useState(false);
 
   const cartItems = [
     {
       id: 1,
-      name: 'Luminous Crystal Ball Night Light with USB',
+      name: "Luminous Crystal Ball Night Light with USB",
       price: 112.54,
       originalPrice: 149.99,
       quantity: 1,
-      image: '/api/placeholder/80/80'
+      image: "/api/placeholder/80/80",
     },
     {
       id: 2,
-      name: 'Self Mixing Electric Auto Stirring Mug',
-      price: 34.50,
+      name: "Self Mixing Electric Auto Stirring Mug",
+      price: 34.5,
       originalPrice: 49.99,
       quantity: 2,
-      image: '/api/placeholder/80/80'
-    }
-  ]
+      image: "/api/placeholder/80/80",
+    },
+  ];
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const shipping = 9.99
-  const tax = subtotal * 0.08
-  const platformFee = 3.99
-  const discount = couponApplied ? couponDiscount : 0
-  const total = subtotal + shipping + tax + platformFee - discount
-  const isFreeShipping = Math.abs(shipping) < 0.01
-  const totalSavings = cartItems.reduce((sum, item) => sum + ((item.originalPrice - item.price) * item.quantity), 0) + discount
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  const shipping = 9.99;
+  const tax = subtotal * 0.08;
+  const platformFee = 3.99;
+  const discount = couponApplied ? couponDiscount : 0;
+  const total = subtotal + shipping + tax + platformFee - discount;
+  const isFreeShipping = Math.abs(shipping) < 0.01;
+  const totalSavings =
+    cartItems.reduce(
+      (sum, item) => sum + (item.originalPrice - item.price) * item.quantity,
+      0,
+    ) + discount;
 
   const applyCoupon = () => {
-    if (!couponCode) return
+    if (!couponCode) return;
 
     // Simple coupon logic - in real app this would validate against a database
-    if (couponCode.toUpperCase() === 'SAVE10') {
-      setCouponDiscount(subtotal * 0.1) // 10% discount
-      setCouponApplied(true)
-    } else if (couponCode.toUpperCase() === 'FREESHIP') {
-      setCouponDiscount(shipping) // Free shipping
-      setCouponApplied(true)
-    } else if (couponCode.toUpperCase() === 'BONZI25') {
-      setCouponDiscount(25) // $25 off
-      setCouponApplied(true)
+    if (couponCode.toUpperCase() === "SAVE10") {
+      setCouponDiscount(subtotal * 0.1); // 10% discount
+      setCouponApplied(true);
+    } else if (couponCode.toUpperCase() === "FREESHIP") {
+      setCouponDiscount(shipping); // Free shipping
+      setCouponApplied(true);
+    } else if (couponCode.toUpperCase() === "BONZI25") {
+      setCouponDiscount(25); // $25 off
+      setCouponApplied(true);
     } else {
-      alert('Invalid coupon code')
+      alert("Invalid coupon code");
     }
-  }
+  };
 
   const removeCoupon = () => {
-    setCouponCode('')
-    setCouponDiscount(0)
-    setCouponApplied(false)
-  }
+    setCouponCode("");
+    setCouponDiscount(0);
+    setCouponApplied(false);
+  };
 
   const toggleOrderSummary = () => {
-    setShowOrderSummary(!showOrderSummary)
-  }
+    setShowOrderSummary(!showOrderSummary);
+  };
 
   // Validation functions
   const validateTab = (tab: string): boolean => {
-    const newErrors: { [key: string]: string } = {}
+    const newErrors: { [key: string]: string } = {};
 
-    if (tab === 'contact') {
-      if (!formData.email) newErrors.email = 'Email is required'
-      else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid'
-      if (!formData.phone) newErrors.phone = 'Phone number is required'
-      else if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = 'Phone number must be 10 digits'
+    if (tab === "contact") {
+      if (!formData.email) newErrors.email = "Email is required";
+      else if (!/\S+@\S+\.\S+/.test(formData.email))
+        newErrors.email = "Email is invalid";
+      if (!formData.phone) newErrors.phone = "Phone number is required";
+      else if (!/^\d{10}$/.test(formData.phone))
+        newErrors.phone = "Phone number must be 10 digits";
     }
 
-    if (tab === 'delivery') {
-      if (!formData.firstName) newErrors.firstName = 'First name is required'
-      if (!formData.lastName) newErrors.lastName = 'Last name is required'
-      if (!formData.address) newErrors.address = 'Address is required'
-      if (!formData.city) newErrors.city = 'City is required'
-      if (!formData.zipCode) newErrors.zipCode = 'ZIP code is required'
-      else if (!/^\d{5}$/.test(formData.zipCode)) newErrors.zipCode = 'ZIP code must be 5 digits'
+    if (tab === "delivery") {
+      if (!formData.firstName) newErrors.firstName = "First name is required";
+      if (!formData.lastName) newErrors.lastName = "Last name is required";
+      if (!formData.address) newErrors.address = "Address is required";
+      if (!formData.city) newErrors.city = "City is required";
+      if (!formData.zipCode) newErrors.zipCode = "ZIP code is required";
+      else if (!/^\d{5}$/.test(formData.zipCode))
+        newErrors.zipCode = "ZIP code must be 5 digits";
     }
 
-    if (tab === 'payment' && formData.paymentMethod === 'card') {
-      if (!formData.cardNumber) newErrors.cardNumber = 'Card number is required'
-      else if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, ''))) newErrors.cardNumber = 'Invalid card number'
-      if (!formData.expiryDate) newErrors.expiryDate = 'Expiry date is required'
-      else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiryDate)) newErrors.expiryDate = 'Invalid format (MM/YY)'
-      if (!formData.cvv) newErrors.cvv = 'CVV is required'
-      else if (!/^\d{3,4}$/.test(formData.cvv)) newErrors.cvv = 'Invalid CVV'
-      if (!formData.cardholderName) newErrors.cardholderName = 'Cardholder name is required'
+    if (tab === "payment" && formData.paymentMethod === "card") {
+      if (!formData.cardNumber)
+        newErrors.cardNumber = "Card number is required";
+      else if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, "")))
+        newErrors.cardNumber = "Invalid card number";
+      if (!formData.expiryDate)
+        newErrors.expiryDate = "Expiry date is required";
+      else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiryDate))
+        newErrors.expiryDate = "Invalid format (MM/YY)";
+      if (!formData.cvv) newErrors.cvv = "CVV is required";
+      else if (!/^\d{3,4}$/.test(formData.cvv)) newErrors.cvv = "Invalid CVV";
+      if (!formData.cardholderName)
+        newErrors.cardholderName = "Cardholder name is required";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
+    const { name, value } = e.target;
 
     // Format card number with spaces
-    if (name === 'cardNumber') {
-      const formatted = value.replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, '$1 ')
-      setFormData({ ...formData, [name]: formatted })
+    if (name === "cardNumber") {
+      const formatted = value
+        .replace(/\s/g, "")
+        .replace(/(\d{4})(?=\d)/g, "$1 ");
+      setFormData({ ...formData, [name]: formatted });
     }
     // Format expiry date
-    else if (name === 'expiryDate') {
-      const formatted = value.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2')
-      setFormData({ ...formData, [name]: formatted })
+    else if (name === "expiryDate") {
+      const formatted = value
+        .replace(/\D/g, "")
+        .replace(/(\d{2})(\d)/, "$1/$2");
+      setFormData({ ...formData, [name]: formatted });
     }
     // Format CVV (numbers only)
-    else if (name === 'cvv') {
-      const formatted = value.replace(/\D/g, '')
-      setFormData({ ...formData, [name]: formatted })
+    else if (name === "cvv") {
+      const formatted = value.replace(/\D/g, "");
+      setFormData({ ...formData, [name]: formatted });
     }
     // Format ZIP code (numbers only, max 5 digits)
-    else if (name === 'zipCode') {
-      const formatted = value.replace(/\D/g, '').slice(0, 5)
-      setFormData({ ...formData, [name]: formatted })
+    else if (name === "zipCode") {
+      const formatted = value.replace(/\D/g, "").slice(0, 5);
+      setFormData({ ...formData, [name]: formatted });
     }
     // Format phone (numbers only, max 10 digits)
-    else if (name === 'phone') {
-      const formatted = value.replace(/\D/g, '').slice(0, 10)
-      setFormData({ ...formData, [name]: formatted })
-    }
-    else {
-      setFormData({ ...formData, [name]: value })
+    else if (name === "phone") {
+      const formatted = value.replace(/\D/g, "").slice(0, 10);
+      setFormData({ ...formData, [name]: formatted });
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors({ ...errors, [name]: '' })
+      setErrors({ ...errors, [name]: "" });
     }
-  }
+  };
 
   const changeTab = (tab: string) => {
-    const currentTab = activeTab
+    const currentTab = activeTab;
 
     // Validate current tab before changing
     if (validateTab(currentTab)) {
-      setActiveTab(tab)
+      setActiveTab(tab);
     }
-  }
+  };
 
   const placeOrder = async () => {
-    if (!validateTab('payment')) return
+    if (!validateTab("payment")) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     // Simulate order placement
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    alert('Order placed successfully! Thank you for shopping with BonziCart.')
-    setIsLoading(false)
-  }
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    alert("Order placed successfully! Thank you for shopping with BonziCart.");
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -196,12 +218,12 @@ function App() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Mobile Order Summary Toggle */}
         <div className="lg:hidden mb-4">
-          <button 
+          <button
             onClick={toggleOrderSummary}
             className="w-full p-3 bg-orange-50 border border-orange-200 rounded flex justify-between items-center"
           >
             <span className="font-medium">
-              {showOrderSummary ? 'Hide Order Summary' : 'Show Order Summary'}
+              {showOrderSummary ? "Hide Order Summary" : "Show Order Summary"}
             </span>
             <span className="font-medium">${total.toFixed(2)}</span>
           </button>
@@ -210,24 +232,38 @@ function App() {
         {/* Mobile Order Summary (Collapsible) */}
         {showOrderSummary && (
           <div className="lg:hidden mb-4 bg-white p-4 shadow-sm">
-            <h3 className="text-lg font-medium text-gray-800 mb-3">ORDER SUMMARY</h3>
+            <h3 className="text-lg font-medium text-gray-800 mb-3">
+              ORDER SUMMARY
+            </h3>
             <div className="border-t border-gray-200 pt-3">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex py-3 border-b border-gray-100">
+                <div
+                  key={item.id}
+                  className="flex py-3 border-b border-gray-100"
+                >
                   <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
                     <span className="text-2xl">📦</span>
                   </div>
                   <div className="flex-1">
                     <div className="text-sm">{item.name}</div>
                     <div className="flex items-center text-sm mt-1">
-                      <span className="text-gray-800 font-medium">${item.price.toFixed(2)}</span>
-                      <span className="text-gray-500 line-through text-xs ml-2">${item.originalPrice.toFixed(2)}</span>
+                      <span className="text-gray-800 font-medium">
+                        ${item.price.toFixed(2)}
+                      </span>
+                      <span className="text-gray-500 line-through text-xs ml-2">
+                        ${item.originalPrice.toFixed(2)}
+                      </span>
                       <span className="text-green-600 text-xs ml-2">
-                        {Math.round((1 - item.price/item.originalPrice) * 100)}% off
+                        {Math.round(
+                          (1 - item.price / item.originalPrice) * 100,
+                        )}
+                        % off
                       </span>
                     </div>
                     <div className="flex items-center mt-2">
-                      <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
+                      <span className="text-sm text-gray-600">
+                        Qty: {item.quantity}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -374,33 +410,45 @@ function App() {
                   }
                 `}
               </style>
-              
+
               <div className="checkout-container">
                 <div className="vertical-tabs">
                   {/* Contact Information Tab */}
                   <div className="vertical-tab">
-                    <div 
-                      className={`tab-header ${activeTab === 'contact' ? 'active' : activeTab === 'delivery' || activeTab === 'summary' || activeTab === 'payment' ? 'completed' : ''}`}
-                      onClick={() => changeTab('contact')}
+                    <div
+                      className={`tab-header ${activeTab === "contact" ? "active" : activeTab === "delivery" || activeTab === "summary" || activeTab === "payment" ? "completed" : ""}`}
+                      onClick={() => changeTab("contact")}
                     >
                       <div className="tab-number">
-                        {activeTab === 'delivery' || activeTab === 'summary' || activeTab === 'payment' ? '✓' : '1'}
+                        {activeTab === "delivery" ||
+                        activeTab === "summary" ||
+                        activeTab === "payment"
+                          ? "✓"
+                          : "1"}
                       </div>
                       <div className="tab-title">Contact Information</div>
-                      {(activeTab === 'delivery' || activeTab === 'summary' || activeTab === 'payment') && formData.email && (
-                        <div className="tab-action">
-                          {formData.email}
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); changeTab('contact'); }} 
-                            className="ml-2 text-orange-500 underline"
-                          >
-                            Change
-                          </button>
-                        </div>
-                      )}
+                      {(activeTab === "delivery" ||
+                        activeTab === "summary" ||
+                        activeTab === "payment") &&
+                        formData.email && (
+                          <div className="tab-action">
+                            {formData.email}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                changeTab("contact");
+                              }}
+                              className="ml-2 text-orange-500 underline"
+                            >
+                              Change
+                            </button>
+                          </div>
+                        )}
                     </div>
-                    <div className={`tab-content ${activeTab === 'contact' ? 'active' : ''}`}>
-              <div className="space-y-4">
+                    <div
+                      className={`tab-content ${activeTab === "contact" ? "active" : ""}`}
+                    >
+                      <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Email Address *
@@ -411,12 +459,16 @@ function App() {
                             value={formData.email}
                             onChange={handleInputChange}
                             className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                              errors.email
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-orange-500"
                             }`}
                             placeholder="example@email.com"
                           />
                           {errors.email && (
-                            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                            <p className="mt-1 text-sm text-red-600">
+                              {errors.email}
+                            </p>
                           )}
                         </div>
                         <div>
@@ -429,18 +481,22 @@ function App() {
                             value={formData.phone}
                             onChange={handleInputChange}
                             className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                              errors.phone
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-orange-500"
                             }`}
                             placeholder="10-digit mobile number"
                           />
                           {errors.phone && (
-                            <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                            <p className="mt-1 text-sm text-red-600">
+                              {errors.phone}
+                            </p>
                           )}
                         </div>
                       </div>
                       <div className="flex justify-end mt-6">
                         <button
-                          onClick={() => changeTab('delivery')}
+                          onClick={() => changeTab("delivery")}
                           className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
                         >
                           CONTINUE
@@ -451,29 +507,38 @@ function App() {
 
                   {/* Delivery Address Tab */}
                   <div className="vertical-tab">
-                    <div 
-                      className={`tab-header ${activeTab === 'delivery' ? 'active' : activeTab === 'summary' || activeTab === 'payment' ? 'completed' : ''}`}
-                      onClick={() => validateTab('contact') && changeTab('delivery')}
+                    <div
+                      className={`tab-header ${activeTab === "delivery" ? "active" : activeTab === "summary" || activeTab === "payment" ? "completed" : ""}`}
+                      onClick={() =>
+                        validateTab("contact") && changeTab("delivery")
+                      }
                     >
                       <div className="tab-number">
-                        {activeTab === 'summary' || activeTab === 'payment' ? '✓' : '2'}
+                        {activeTab === "summary" || activeTab === "payment"
+                          ? "✓"
+                          : "2"}
                       </div>
                       <div className="tab-title">Delivery Address</div>
-                      {(activeTab === 'summary' || activeTab === 'payment') && formData.firstName && (
-                        <div className="tab-action">
-                          {formData.firstName} {formData.lastName}
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); changeTab('delivery'); }} 
-                            className="ml-2 text-orange-500 underline"
-                          >
-                            Change
-                          </button>
-                        </div>
-                      )}
+                      {(activeTab === "summary" || activeTab === "payment") &&
+                        formData.firstName && (
+                          <div className="tab-action">
+                            {formData.firstName} {formData.lastName}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                changeTab("delivery");
+                              }}
+                              className="ml-2 text-orange-500 underline"
+                            >
+                              Change
+                            </button>
+                          </div>
+                        )}
                     </div>
-                    <div className={`tab-content ${activeTab === 'delivery' ? 'active' : ''}`}>
-
-              <div className="mb-4">
+                    <div
+                      className={`tab-content ${activeTab === "delivery" ? "active" : ""}`}
+                    >
+                      <div className="mb-4">
                         <button className="flex items-center justify-center text-orange-500 border border-orange-500 rounded p-2 hover:bg-orange-50 w-full sm:w-auto">
                           <span className="mr-2">📍</span>
                           Use my current location
@@ -491,12 +556,16 @@ function App() {
                             value={formData.firstName}
                             onChange={handleInputChange}
                             className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.firstName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                              errors.firstName
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-orange-500"
                             }`}
                             placeholder="First Name"
                           />
                           {errors.firstName && (
-                            <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                            <p className="mt-1 text-sm text-red-600">
+                              {errors.firstName}
+                            </p>
                           )}
                         </div>
                         <div>
@@ -509,12 +578,16 @@ function App() {
                             value={formData.lastName}
                             onChange={handleInputChange}
                             className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.lastName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                              errors.lastName
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-orange-500"
                             }`}
                             placeholder="Last Name"
                           />
                           {errors.lastName && (
-                            <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                            <p className="mt-1 text-sm text-red-600">
+                              {errors.lastName}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -529,13 +602,17 @@ function App() {
                             value={formData.address}
                             onChange={handleInputChange}
                             className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.address ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                              errors.address
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-orange-500"
                             }`}
                             placeholder="House No., Building Name, Street Name, Area"
                             rows={2}
                           />
                           {errors.address && (
-                            <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+                            <p className="mt-1 text-sm text-red-600">
+                              {errors.address}
+                            </p>
                           )}
                         </div>
 
@@ -579,12 +656,16 @@ function App() {
                               value={formData.city}
                               onChange={handleInputChange}
                               className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                errors.city ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                                errors.city
+                                  ? "border-red-500 focus:ring-red-500"
+                                  : "border-gray-300 focus:ring-orange-500"
                               }`}
                               placeholder="City"
                             />
                             {errors.city && (
-                              <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                              <p className="mt-1 text-sm text-red-600">
+                                {errors.city}
+                              </p>
                             )}
                           </div>
                           <div>
@@ -597,12 +678,16 @@ function App() {
                               value={formData.zipCode}
                               onChange={handleInputChange}
                               className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                errors.zipCode ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                                errors.zipCode
+                                  ? "border-red-500 focus:ring-red-500"
+                                  : "border-gray-300 focus:ring-orange-500"
                               }`}
                               placeholder="Pincode"
                             />
                             {errors.zipCode && (
-                              <p className="mt-1 text-sm text-red-600">{errors.zipCode}</p>
+                              <p className="mt-1 text-sm text-red-600">
+                                {errors.zipCode}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -631,13 +716,13 @@ function App() {
 
                       <div className="flex justify-between mt-6">
                         <button
-                          onClick={() => changeTab('contact')}
+                          onClick={() => changeTab("contact")}
                           className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
                         >
                           BACK
                         </button>
                         <button
-                          onClick={() => changeTab('summary')}
+                          onClick={() => changeTab("summary")}
                           className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
                         >
                           CONTINUE
@@ -648,19 +733,24 @@ function App() {
 
                   {/* Order Summary Tab */}
                   <div className="vertical-tab">
-                    <div 
-                      className={`tab-header ${activeTab === 'summary' ? 'active' : activeTab === 'payment' ? 'completed' : ''}`}
-                      onClick={() => validateTab('delivery') && changeTab('summary')}
+                    <div
+                      className={`tab-header ${activeTab === "summary" ? "active" : activeTab === "payment" ? "completed" : ""}`}
+                      onClick={() =>
+                        validateTab("delivery") && changeTab("summary")
+                      }
                     >
                       <div className="tab-number">
-                        {activeTab === 'payment' ? '✓' : '3'}
+                        {activeTab === "payment" ? "✓" : "3"}
                       </div>
                       <div className="tab-title">Order Summary</div>
-                      {activeTab === 'payment' && (
+                      {activeTab === "payment" && (
                         <div className="tab-action">
                           {cartItems.length} items
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); changeTab('summary'); }} 
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              changeTab("summary");
+                            }}
                             className="ml-2 text-orange-500 underline"
                           >
                             Change
@@ -668,25 +758,38 @@ function App() {
                         </div>
                       )}
                     </div>
-                    <div className={`tab-content ${activeTab === 'summary' ? 'active' : ''}`}>
-
-              <div className="border-t border-gray-200 pt-3">
+                    <div
+                      className={`tab-content ${activeTab === "summary" ? "active" : ""}`}
+                    >
+                      <div className="border-t border-gray-200 pt-3">
                         {cartItems.map((item) => (
-                          <div key={item.id} className="flex py-3 border-b border-gray-100">
+                          <div
+                            key={item.id}
+                            className="flex py-3 border-b border-gray-100"
+                          >
                             <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
                               <span className="text-2xl">📦</span>
                             </div>
                             <div className="flex-1">
                               <div className="text-sm">{item.name}</div>
                               <div className="flex items-center text-sm mt-1">
-                                <span className="text-gray-800 font-medium">${item.price.toFixed(2)}</span>
-                                <span className="text-gray-500 line-through text-xs ml-2">${item.originalPrice.toFixed(2)}</span>
+                                <span className="text-gray-800 font-medium">
+                                  ${item.price.toFixed(2)}
+                                </span>
+                                <span className="text-gray-500 line-through text-xs ml-2">
+                                  ${item.originalPrice.toFixed(2)}
+                                </span>
                                 <span className="text-green-600 text-xs ml-2">
-                                  {Math.round((1 - item.price/item.originalPrice) * 100)}% off
+                                  {Math.round(
+                                    (1 - item.price / item.originalPrice) * 100,
+                                  )}
+                                  % off
                                 </span>
                               </div>
                               <div className="flex items-center mt-2">
-                                <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
+                                <span className="text-sm text-gray-600">
+                                  Qty: {item.quantity}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -726,7 +829,9 @@ function App() {
                       <div className="mt-6 pt-4 border-t border-gray-200">
                         <div className="flex items-center mb-3">
                           <div className="text-orange-500 mr-2">🏷️</div>
-                          <h3 className="text-md font-medium text-gray-800">APPLY COUPON</h3>
+                          <h3 className="text-md font-medium text-gray-800">
+                            APPLY COUPON
+                          </h3>
                         </div>
                         {!couponApplied ? (
                           <div className="flex">
@@ -747,10 +852,14 @@ function App() {
                         ) : (
                           <div className="flex items-center justify-between bg-green-50 p-3 rounded">
                             <div>
-                              <div className="text-green-700 font-medium">{couponCode.toUpperCase()}</div>
-                              <div className="text-green-600 text-sm">${couponDiscount.toFixed(2)} discount applied</div>
+                              <div className="text-green-700 font-medium">
+                                {couponCode.toUpperCase()}
+                              </div>
+                              <div className="text-green-600 text-sm">
+                                ${couponDiscount.toFixed(2)} discount applied
+                              </div>
                             </div>
-                            <button 
+                            <button
                               onClick={removeCoupon}
                               className="text-red-500 hover:text-red-700"
                             >
@@ -762,16 +871,16 @@ function App() {
                           Try: SAVE10, FREESHIP, BONZI25
                         </div>
                       </div>
-                           
+
                       <div className="flex justify-between mt-6">
                         <button
-                          onClick={() => changeTab('delivery')}
+                          onClick={() => changeTab("delivery")}
                           className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
                         >
                           BACK
                         </button>
                         <button
-                          onClick={() => changeTab('payment')}
+                          onClick={() => changeTab("payment")}
                           className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
                         >
                           CONTINUE
@@ -782,16 +891,19 @@ function App() {
 
                   {/* Payment Options Tab */}
                   <div className="vertical-tab">
-                    <div 
-                      className={`tab-header ${activeTab === 'payment' ? 'active' : ''}`}
-                      onClick={() => validateTab('summary') && changeTab('payment')}
+                    <div
+                      className={`tab-header ${activeTab === "payment" ? "active" : ""}`}
+                      onClick={() =>
+                        validateTab("summary") && changeTab("payment")
+                      }
                     >
                       <div className="tab-number">4</div>
                       <div className="tab-title">Payment Options</div>
                     </div>
-                    <div className={`tab-content ${activeTab === 'payment' ? 'active' : ''}`}>
-
-              {isLoading && (
+                    <div
+                      className={`tab-content ${activeTab === "payment" ? "active" : ""}`}
+                    >
+                      {isLoading && (
                         <div className="mb-4 p-3 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded">
                           Complete payment in: 00:15:00
                         </div>
@@ -804,13 +916,17 @@ function App() {
                             id="payment_upi"
                             name="paymentMethod"
                             value="upi"
-                            checked={formData.paymentMethod === 'upi'}
-                            onChange={() => setFormData({ ...formData, paymentMethod: 'upi' })}
+                            checked={formData.paymentMethod === "upi"}
+                            onChange={() =>
+                              setFormData({ ...formData, paymentMethod: "upi" })
+                            }
                             className="mr-3"
                           />
                           <label htmlFor="payment_upi" className="flex-1">
                             <div className="font-medium">UPI</div>
-                            <div className="text-sm text-gray-500">Pay using UPI Apps</div>
+                            <div className="text-sm text-gray-500">
+                              Pay using UPI Apps
+                            </div>
                           </label>
                         </div>
 
@@ -820,13 +936,22 @@ function App() {
                             id="payment_card"
                             name="paymentMethod"
                             value="card"
-                            checked={formData.paymentMethod === 'card'}
-                            onChange={() => setFormData({ ...formData, paymentMethod: 'card' })}
+                            checked={formData.paymentMethod === "card"}
+                            onChange={() =>
+                              setFormData({
+                                ...formData,
+                                paymentMethod: "card",
+                              })
+                            }
                             className="mr-3"
                           />
                           <label htmlFor="payment_card" className="flex-1">
-                            <div className="font-medium">Credit / Debit / ATM Card</div>
-                            <div className="text-sm text-gray-500">Add and secure cards as per guidelines</div>
+                            <div className="font-medium">
+                              Credit / Debit / ATM Card
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              Add and secure cards as per guidelines
+                            </div>
                           </label>
                         </div>
 
@@ -836,13 +961,23 @@ function App() {
                             id="payment_netbanking"
                             name="paymentMethod"
                             value="netbanking"
-                            checked={formData.paymentMethod === 'netbanking'}
-                            onChange={() => setFormData({ ...formData, paymentMethod: 'netbanking' })}
+                            checked={formData.paymentMethod === "netbanking"}
+                            onChange={() =>
+                              setFormData({
+                                ...formData,
+                                paymentMethod: "netbanking",
+                              })
+                            }
                             className="mr-3"
                           />
-                          <label htmlFor="payment_netbanking" className="flex-1">
+                          <label
+                            htmlFor="payment_netbanking"
+                            className="flex-1"
+                          >
                             <div className="font-medium">Net Banking</div>
-                            <div className="text-sm text-gray-500">Pay through your bank account</div>
+                            <div className="text-sm text-gray-500">
+                              Pay through your bank account
+                            </div>
                           </label>
                         </div>
 
@@ -852,18 +987,22 @@ function App() {
                             id="payment_cod"
                             name="paymentMethod"
                             value="cod"
-                            checked={formData.paymentMethod === 'cod'}
-                            onChange={() => setFormData({ ...formData, paymentMethod: 'cod' })}
+                            checked={formData.paymentMethod === "cod"}
+                            onChange={() =>
+                              setFormData({ ...formData, paymentMethod: "cod" })
+                            }
                             className="mr-3"
                           />
                           <label htmlFor="payment_cod" className="flex-1">
                             <div className="font-medium">Cash on Delivery</div>
-                            <div className="text-sm text-gray-500">Pay when you receive your order</div>
+                            <div className="text-sm text-gray-500">
+                              Pay when you receive your order
+                            </div>
                           </label>
                         </div>
                       </div>
 
-                      {formData.paymentMethod === 'card' && (
+                      {formData.paymentMethod === "card" && (
                         <div className="border border-gray-200 rounded p-4 mb-6 bg-gray-50">
                           <div className="space-y-4">
                             <div>
@@ -876,13 +1015,17 @@ function App() {
                                 value={formData.cardNumber}
                                 onChange={handleInputChange}
                                 className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                  errors.cardNumber ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                                  errors.cardNumber
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-gray-300 focus:ring-orange-500"
                                 }`}
                                 placeholder="Card Number"
                                 maxLength={19}
                               />
                               {errors.cardNumber && (
-                                <p className="mt-1 text-sm text-red-600">{errors.cardNumber}</p>
+                                <p className="mt-1 text-sm text-red-600">
+                                  {errors.cardNumber}
+                                </p>
                               )}
                             </div>
 
@@ -896,12 +1039,16 @@ function App() {
                                 value={formData.cardholderName}
                                 onChange={handleInputChange}
                                 className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                  errors.cardholderName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                                  errors.cardholderName
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-gray-300 focus:ring-orange-500"
                                 }`}
                                 placeholder="Name on Card"
                               />
                               {errors.cardholderName && (
-                                <p className="mt-1 text-sm text-red-600">{errors.cardholderName}</p>
+                                <p className="mt-1 text-sm text-red-600">
+                                  {errors.cardholderName}
+                                </p>
                               )}
                             </div>
 
@@ -916,13 +1063,17 @@ function App() {
                                   value={formData.expiryDate}
                                   onChange={handleInputChange}
                                   className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                    errors.expiryDate ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                                    errors.expiryDate
+                                      ? "border-red-500 focus:ring-red-500"
+                                      : "border-gray-300 focus:ring-orange-500"
                                   }`}
                                   placeholder="MM/YY"
                                   maxLength={5}
                                 />
                                 {errors.expiryDate && (
-                                  <p className="mt-1 text-sm text-red-600">{errors.expiryDate}</p>
+                                  <p className="mt-1 text-sm text-red-600">
+                                    {errors.expiryDate}
+                                  </p>
                                 )}
                               </div>
                               <div>
@@ -935,13 +1086,17 @@ function App() {
                                   value={formData.cvv}
                                   onChange={handleInputChange}
                                   className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                    errors.cvv ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'
+                                    errors.cvv
+                                      ? "border-red-500 focus:ring-red-500"
+                                      : "border-gray-300 focus:ring-orange-500"
                                   }`}
                                   placeholder="CVV"
                                   maxLength={4}
                                 />
                                 {errors.cvv && (
-                                  <p className="mt-1 text-sm text-red-600">{errors.cvv}</p>
+                                  <p className="mt-1 text-sm text-red-600">
+                                    {errors.cvv}
+                                  </p>
                                 )}
                               </div>
                             </div>
@@ -951,7 +1106,7 @@ function App() {
 
                       <div className="flex justify-between">
                         <button
-                          onClick={() => changeTab('summary')}
+                          onClick={() => changeTab("summary")}
                           className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
                         >
                           BACK
@@ -961,7 +1116,7 @@ function App() {
                           disabled={isLoading}
                           className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
                         >
-                          {isLoading ? 'Processing...' : 'PLACE ORDER'}
+                          {isLoading ? "Processing..." : "PLACE ORDER"}
                         </button>
                       </div>
                     </div>
@@ -970,27 +1125,34 @@ function App() {
               </div>
 
               {/* Order Confirmation Email */}
-              {activeTab === 'payment' && (
+              {activeTab === "payment" && (
                 <div className="bg-white p-4 shadow-sm text-sm text-gray-600 mt-4">
-                  Order confirmation email will be sent to {formData.email || 'your email address'}
+                  Order confirmation email will be sent to{" "}
+                  {formData.email || "your email address"}
                 </div>
               )}
             </div>
+          </div>
 
           {/* Right Column - Order Summary */}
           <div className="w-full lg:w-1/3 hidden lg:block">
             {/* Price Details */}
             <div className="bg-white p-4 shadow-sm mb-4">
-              <h3 className="text-lg font-medium text-gray-800 mb-3">PRICE DETAILS</h3>
+              <h3 className="text-lg font-medium text-gray-800 mb-3">
+                PRICE DETAILS
+              </h3>
               <div className="border-t border-gray-200 pt-3 space-y-3">
                 <div className="flex justify-between">
-                  <span>Price ({cartItems.length} item{cartItems.length !== 1 ? 's' : ''})</span>
+                  <span>
+                    Price ({cartItems.length} item
+                    {cartItems.length !== 1 ? "s" : ""})
+                  </span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery Charges</span>
                   <span className={isFreeShipping ? "text-green-600" : ""}>
-                    {isFreeShipping ? 'FREE' : `$${shipping.toFixed(2)}`}
+                    {isFreeShipping ? "FREE" : `$${shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -1015,24 +1177,38 @@ function App() {
 
             {/* Order Items - Show on all steps */}
             <div className="bg-white p-4 shadow-sm mb-4">
-              <h3 className="text-lg font-medium text-gray-800 mb-3">ORDER SUMMARY</h3>
+              <h3 className="text-lg font-medium text-gray-800 mb-3">
+                ORDER SUMMARY
+              </h3>
               <div className="border-t border-gray-200 pt-3">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex py-3 border-b border-gray-100">
+                  <div
+                    key={item.id}
+                    className="flex py-3 border-b border-gray-100"
+                  >
                     <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
                       <span className="text-2xl">📦</span>
                     </div>
                     <div className="flex-1">
                       <div className="text-sm">{item.name}</div>
                       <div className="flex items-center text-sm mt-1">
-                        <span className="text-gray-800 font-medium">${item.price.toFixed(2)}</span>
-                        <span className="text-gray-500 line-through text-xs ml-2">${item.originalPrice.toFixed(2)}</span>
+                        <span className="text-gray-800 font-medium">
+                          ${item.price.toFixed(2)}
+                        </span>
+                        <span className="text-gray-500 line-through text-xs ml-2">
+                          ${item.originalPrice.toFixed(2)}
+                        </span>
                         <span className="text-green-600 text-xs ml-2">
-                          {Math.round((1 - item.price/item.originalPrice) * 100)}% off
+                          {Math.round(
+                            (1 - item.price / item.originalPrice) * 100,
+                          )}
+                          % off
                         </span>
                       </div>
                       <div className="flex items-center mt-2">
-                        <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
+                        <span className="text-sm text-gray-600">
+                          Qty: {item.quantity}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1045,7 +1221,10 @@ function App() {
               <div className="flex items-start">
                 <div className="mr-3 text-green-600">🔒</div>
                 <div>
-                  <p className="text-sm text-gray-800">Safe and Secure Payments. Easy returns. 100% Authentic products.</p>
+                  <p className="text-sm text-gray-800">
+                    Safe and Secure Payments. Easy returns. 100% Authentic
+                    products.
+                  </p>
                 </div>
               </div>
             </div>
@@ -1058,7 +1237,7 @@ function App() {
         <p>© 2023 BonziCart. All rights reserved.</p>
       </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
