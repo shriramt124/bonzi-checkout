@@ -63,4 +63,28 @@ button {
   .text-xl {
     font-size: 1.1rem;
   }
+  
+  .text-lg {
+    font-size: 0.95rem;
+  }
+  
+  .py-2 {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+  
+  .px-6 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Make coupon code inputs and buttons more compact */
+  .flex-1 {
+    min-width: 0;
+  }
+  
+  /* Better wrapping for order items */
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
 }
