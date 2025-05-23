@@ -298,17 +298,92 @@ function App() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Column - Checkout Process */}
           <div className="w-full lg:w-2/3">
-            {/* Steps Bar */}
+            {/* Steps Bar - Vertical */}
             <div className="bg-white p-4 mb-4 shadow-sm">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="flex items-center" onClick={() => currentStep > 1 ? setCurrentStep(1) : null}>
-                  {renderStepIndicator(1, 'LOGIN')}
+              <h3 className="text-lg font-medium text-gray-800 mb-3">CHECKOUT PROCESS</h3>
+              <div className="space-y-3">
+                <div 
+                  className={`flex items-center p-3 rounded cursor-pointer ${currentStep === 1 ? 'bg-orange-50 border border-orange-200' : currentStep > 1 ? 'bg-green-50 border border-green-200' : 'hover:bg-gray-50'}`}
+                  onClick={() => currentStep > 1 ? setCurrentStep(1) : null}
+                >
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium mr-3 ${
+                    currentStep === 1 
+                    ? 'bg-orange-500 text-white' 
+                    : currentStep > 1 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-gray-200 text-gray-600'
+                  }`}>
+                    {currentStep > 1 ? '✓' : <span className="hidden sm:inline">1</span>}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium">Contact Information</div>
+                    {currentStep > 1 && (
+                      <div className="text-sm text-gray-600 mt-1">
+                        {formData.email} • {formData.phone}
+                      </div>
+                    )}
+                  </div>
+                  {currentStep > 1 && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setCurrentStep(1); }} 
+                      className="text-orange-500 text-sm hover:text-orange-700"
+                    >
+                      Edit
+                    </button>
+                  )}
                 </div>
-                <div className="flex items-center" onClick={() => currentStep > 2 ? setCurrentStep(2) : null}>
-                  {renderStepIndicator(2, 'DELIVERY ADDRESS')}
+
+                <div 
+                  className={`flex items-center p-3 rounded cursor-pointer ${
+                    currentStep === 2 ? 'bg-orange-50 border border-orange-200' : 
+                    currentStep > 2 ? 'bg-green-50 border border-green-200' : 
+                    currentStep < 2 ? 'opacity-70' : 'hover:bg-gray-50'
+                  }`}
+                  onClick={() => currentStep > 2 ? setCurrentStep(2) : null}
+                >
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium mr-3 ${
+                    currentStep === 2 
+                    ? 'bg-orange-500 text-white' 
+                    : currentStep > 2 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-gray-200 text-gray-600'
+                  }`}>
+                    {currentStep > 2 ? '✓' : <span className="hidden sm:inline">2</span>}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium">Delivery Address</div>
+                    {currentStep > 2 && (
+                      <div className="text-sm text-gray-600 mt-1">
+                        {formData.firstName} {formData.lastName}, {formData.address}, {formData.city}
+                      </div>
+                    )}
+                  </div>
+                  {currentStep > 2 && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setCurrentStep(2); }} 
+                      className="text-orange-500 text-sm hover:text-orange-700"
+                    >
+                      Edit
+                    </button>
+                  )}
                 </div>
-                <div className="flex items-center">
-                  {renderStepIndicator(3, 'PAYMENT OPTIONS')}
+
+                <div 
+                  className={`flex items-center p-3 rounded ${
+                    currentStep === 3 ? 'bg-orange-50 border border-orange-200' : 
+                    currentStep < 3 ? 'opacity-70' : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium mr-3 ${
+                    currentStep === 3 
+                    ? 'bg-orange-500 text-white' 
+                    : 'bg-gray-200 text-gray-600'
+                  }`}>
+                    <span className="hidden sm:inline">3</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium">Payment Options</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -758,7 +833,10 @@ function App() {
 
             {/* Coupon Code Section */}
             <div className="bg-white p-4 shadow-sm mb-4">
-              <h3 className="text-md font-medium text-gray-800 mb-3">APPLY COUPON</h3>
+              <div className="flex items-center mb-3">
+                <div className="text-orange-500 mr-2">🏷️</div>
+                <h3 className="text-md font-medium text-gray-800">APPLY COUPON</h3>
+              </div>
               <div className="border-t border-gray-200 pt-3">
                 {!couponApplied ? (
                   <div className="flex">
@@ -767,7 +845,7 @@ function App() {
                       placeholder="Enter coupon code"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="flex-1 p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-orange-500"
                     />
                     <button
                       onClick={applyCoupon}

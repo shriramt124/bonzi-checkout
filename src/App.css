@@ -101,6 +101,11 @@ button {
     height: 1.3rem;
   }
   
+  .w-8, .h-8 {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+  
   /* Make coupon code inputs and buttons more compact */
   .flex-1 {
     min-width: 0;
@@ -109,6 +114,17 @@ button {
   /* Better wrapping for order items */
   .flex-wrap {
     flex-wrap: wrap;
+  }
+  
+  /* Vertical checkout progress */
+  .space-y-3 > * {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Make buttons more touch-friendly */
+  button {
+    min-height: 2.5rem;
   }
 }
 
@@ -209,4 +225,51 @@ button {
 
 .border-orange-500 {
   border-color: #f97316;
+}
+
+/* Vertical checkout flow styles */
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+/* Step indicator for vertical flow */
+.steps-vertical .step {
+  position: relative;
+}
+
+.steps-vertical .step:not(:last-child):after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background-color: #e5e7eb;
+  z-index: 0;
+}
+
+.steps-vertical .step.completed:after {
+  background-color: #22c55e;
+}
+
+.steps-vertical .step.active:after {
+  background-color: #f97316;
+}
+
+/* Animation for step transitions */
+.step-transition {
+  transition: all 0.3s ease;
+}
+
+/* Improved focus states for accessibility */
+button:focus, 
+input:focus, 
+select:focus, 
+textarea:focus {
+  outline: 2px solid #f97316;
+  outline-offset: 1px;
 }
