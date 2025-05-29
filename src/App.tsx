@@ -11,6 +11,9 @@ function App() {
     firstName: "",
     lastName: "",
     phone: "",
+    hasGST: false,
+    companyName: "",
+    gstNumber: "",
     address: "",
     locality: "",
     city: "",
@@ -69,18 +72,35 @@ function App() {
   const applyCoupon = () => {
     if (!couponCode) return;
 
-    // Simple coupon logic - in real app this would validate against a database
-    if (couponCode.toUpperCase() === "SAVE10") {
-      setCouponDiscount(subtotal * 0.1); // 10% discount
-      setCouponApplied(true);
-    } else if (couponCode.toUpperCase() === "FREESHIP") {
-      setCouponDiscount(shipping); // Free shipping
-      setCouponApplied(true);
-    } else if (couponCode.toUpperCase() === "BONZI25") {
-      setCouponDiscount(25); // $25 off
-      setCouponApplied(true);
-    } else {
-      alert("Invalid coupon code");
+    // Coupon logic with new codes
+    switch (couponCode.toUpperCase()) {
+      case 'MMTSECURE':
+        setCouponDiscount(10);
+        setCouponApplied(true);
+        break;
+      case 'MMTRBLEMI':
+        setCouponDiscount(15);
+        setCouponApplied(true);
+        break;
+      case 'MMTSUPER':
+        setCouponDiscount(20);
+        setCouponApplied(true);
+        break;
+      case 'SAVE10':
+        setCouponDiscount(subtotal * 0.1); // 10% discount
+        setCouponApplied(true);
+        break;
+      case 'FREESHIP':
+        setCouponDiscount(shipping); // Free shipping
+        setCouponApplied(true);
+        break;
+      case 'BONZI25':
+        setCouponDiscount(25); // $25 off
+        setCouponApplied(true);
+        break;
+      default:
+        alert('Invalid coupon code');
+        break;
     }
   };
 
@@ -105,6 +125,12 @@ function App() {
       if (!formData.phone) newErrors.phone = "Phone number is required";
       else if (!/^\d{10}$/.test(formData.phone))
         newErrors.phone = "Phone number must be 10 digits";
+      if (formData.hasGST) {
+        if (!formData.companyName) newErrors.companyName = "Company name is required";
+        if (!formData.gstNumber) newErrors.gstNumber = "GST number is required";
+        else if (!/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}$/.test(formData.gstNumber))
+          newErrors.gstNumber = "Invalid GST number format";
+      }
     }
 
     if (tab === "delivery") {
@@ -117,20 +143,20 @@ function App() {
         newErrors.zipCode = "ZIP code must be 5 digits";
     }
 
-    if (tab === "payment" && formData.paymentMethod === "card") {
-      if (!formData.cardNumber)
-        newErrors.cardNumber = "Card number is required";
-      else if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, "")))
-        newErrors.cardNumber = "Invalid card number";
-      if (!formData.expiryDate)
-        newErrors.expiryDate = "Expiry date is required";
-      else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiryDate))
-        newErrors.expiryDate = "Invalid format (MM/YY)";
-      if (!formData.cvv) newErrors.cvv = "CVV is required";
-      else if (!/^\d{3,4}$/.test(formData.cvv)) newErrors.cvv = "Invalid CVV";
-      if (!formData.cardholderName)
-        newErrors.cardholderName = "Cardholder name is required";
-    }
+    /*  if (tab === "payment" && formData.paymentMethod === "card") {
+       if (!formData.cardNumber)
+         newErrors.cardNumber = "Card number is required";
+       else if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, "")))
+         newErrors.cardNumber = "Invalid card number";
+       if (!formData.expiryDate)
+         newErrors.expiryDate = "Expiry date is required";
+       else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiryDate))
+         newErrors.expiryDate = "Invalid format (MM/YY)";
+       if (!formData.cvv) newErrors.cvv = "CVV is required";
+       else if (!/^\d{3,4}$/.test(formData.cvv)) newErrors.cvv = "Invalid CVV";
+       if (!formData.cardholderName)
+         newErrors.cardholderName = "Cardholder name is required";
+     } */
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -233,127 +259,98 @@ function App() {
         {/* Mobile Order Summary (Collapsible) */}
         {showOrderSummary && (
           <div className="lg:hidden mb-4 bg-white p-4 shadow-sm">
-            <h3 className="text-lg font-medium text-gray-800 mb-3">
-              ORDER SUMMARY
-            </h3>
-            <div className="border-t border-gray-200 pt-3">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex py-3 border-b border-gray-100">
-                  <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
-                    <span className="text-2xl">📦</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm">{item.name}</div>
-                    <div className="flex items-center text-sm mt-1">
-                      <span className="text-gray-800 font-medium">
-                        ${item.price.toFixed(2)}
-                      </span>
-                      <span className="text-gray-500 line-through text-xs ml-2">
-                        ${item.originalPrice.toFixed(2)}
-                      </span>
-                      <span className="text-green-600 text-xs ml-2">
-                        {Math.round((1 - item.price / item.originalPrice) * 100)}%
-                        off
-                      </span>
-                    </div>
-                    <div className="flex items-center mt-2">
-                      <span className="text-sm text-gray-600">
-                        Qty: {item.quantity}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <div className="mt-3 pt-3 border-t border-gray-200">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal:</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span>Shipping:</span>
-                  <span>${shipping.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span>Tax:</span>
-                  <span>${tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span>Platform Fee:</span>
-                  <span>${platformFee.toFixed(2)}</span>
-                </div>
-                
-                {/* Moved Coupon Code to just before the final price */}
-                <div className="pt-2 mt-2 border-t border-gray-200">
-                  {!couponApplied ? (
-                    <div>
-                      <div className="flex items-center mb-2">
-                        <div className="text-orange-500 mr-2">🏷️</div>
-                        <h3 className="text-sm font-medium text-gray-800">
-                          APPLY COUPON
-                        </h3>
-                      </div>
-                      <div className="flex">
-                        <input
-                          type="text"
-                          placeholder="Enter coupon code"
-                          value={couponCode}
-                          onChange={(e) => setCouponCode(e.target.value)}
-                          className="flex-1 p-2 text-sm border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-orange-500"
-                        />
-                        <button
-                          onClick={applyCoupon}
-                          className="bg-orange-500 text-white px-3 py-2 text-sm rounded-r hover:bg-orange-600"
-                        >
-                          APPLY
-                        </button>
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1 mb-2">
-                        Try: SAVE10, FREESHIP, BONZI25
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between bg-green-50 p-2 rounded mb-2">
-                      <div>
-                        <div className="text-green-700 font-medium text-sm">
-                          {couponCode.toUpperCase()}
-                        </div>
-                        <div className="text-green-600 text-xs">
-                          ${couponDiscount.toFixed(2)} discount applied
-                        </div>
-                      </div>
-                      <button
-                        onClick={removeCoupon}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
-                  
-                  {couponApplied && (
-                    <div className="flex justify-between text-sm text-green-600">
-                      <span>Discount:</span>
-                      <span>-${couponDiscount.toFixed(2)}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-between font-medium text-base mt-3 pt-2 border-t border-gray-200">
-                  <span>Total:</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
+            {/* Order summary content */}
           </div>
         )}
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left Column - Checkout Process */}
-          <div className="w-full lg:w-3/4">
+          {/* Left Column - Order Summary and Checkout Process */}
+          <div className="w-full lg:w-2/3">
+
+
+            {/* Checkout Process */}
             <div className="bg-white shadow-sm rounded mb-4">
               <div className="checkout-container">
                 <div className="vertical-tabs">
+                  {/* Order Summary Tab */}
+                  <div className="vertical-tab">
+                    <div
+                      className={`tab-header ${activeTab === "summary" ? "active" : activeTab === "payment" ? "completed" : ""}`}
+                      onClick={() =>
+                        validateTab("delivery") && changeTab("summary")
+                      }
+                    >
+                      <div className="tab-number">
+                        {activeTab === "payment" ? "✓" : "3"}
+                      </div>
+                      <div className="tab-title">Order Summary</div>
+                      {activeTab === "payment" && (
+                        <div className="tab-action">
+                          {cartItems.length} items
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              changeTab("summary");
+                            }}
+                            className="ml-2 text-orange-500 underline"
+                          >
+                            Change
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      className={`tab-content ${activeTab === "summary" ? "active" : ""}`}
+                    >
+                      <div className="border-t border-gray-200 pt-3">
+                        {cartItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex py-3 border-b border-gray-100"
+                          >
+                            <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
+                              <span className="text-2xl">📦</span>
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-sm">{item.name}</div>
+                              <div className="flex items-center text-sm mt-1">
+                                <span className="text-gray-800 font-medium">
+                                  ${item.price.toFixed(2)}
+                                </span>
+                                <span className="text-gray-500 line-through text-xs ml-2">
+                                  ${item.originalPrice.toFixed(2)}
+                                </span>
+                                <span className="text-green-600 text-xs ml-2">
+                                  {Math.round((1 - item.price / item.originalPrice) * 100)}%
+                                  off
+                                </span>
+                              </div>
+                              <div className="flex items-center mt-2">
+                                <span className="text-sm text-gray-600">
+                                  Qty: {item.quantity}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex justify-between mt-6">
+                        <button
+                          onClick={() => changeTab("delivery")}
+                          className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
+                        >
+                          BACK
+                        </button>
+                        <button
+                          onClick={() => changeTab("payment")}
+                          className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
+                        >
+                          CONTINUE
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                   {/* Contact Information Tab */}
                   <div className="vertical-tab">
                     <div
@@ -362,8 +359,8 @@ function App() {
                     >
                       <div className="tab-number">
                         {activeTab === "delivery" ||
-                        activeTab === "summary" ||
-                        activeTab === "payment"
+                          activeTab === "summary" ||
+                          activeTab === "payment"
                           ? "✓"
                           : "1"}
                       </div>
@@ -390,6 +387,53 @@ function App() {
                       className={`tab-content ${activeTab === "contact" ? "active" : ""}`}
                     >
                       <div className="space-y-4">
+                        <div className="mb-4">
+                          <label className="flex items-center text-sm text-gray-700 mb-2">
+                            <input
+                              type="checkbox"
+                              checked={formData.hasGST}
+                              onChange={(e) => setFormData({ ...formData, hasGST: e.target.checked })}
+                              className="mr-2"
+                            />
+                            I have a GST number (Optional)
+                          </label>
+                          {formData.hasGST && (
+                            <div className="space-y-3 mt-3">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Company Name *
+                                </label>
+                                <input
+                                  type="text"
+                                  name="companyName"
+                                  value={formData.companyName}
+                                  onChange={handleInputChange}
+                                  className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.companyName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'}`}
+                                  placeholder="Enter company name"
+                                />
+                                {errors.companyName && (
+                                  <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>
+                                )}
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  GST Number *
+                                </label>
+                                <input
+                                  type="text"
+                                  name="gstNumber"
+                                  value={formData.gstNumber}
+                                  onChange={handleInputChange}
+                                  className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.gstNumber ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'}`}
+                                  placeholder="Enter GST number"
+                                />
+                                {errors.gstNumber && (
+                                  <p className="mt-1 text-sm text-red-600">{errors.gstNumber}</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Email Address *
@@ -399,11 +443,10 @@ function App() {
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.email
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-gray-300 focus:ring-orange-500"
-                            }`}
+                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.email
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-orange-500"
+                              }`}
                             placeholder="example@email.com"
                           />
                           {errors.email && (
@@ -421,11 +464,10 @@ function App() {
                             name="phone"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.phone
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-gray-300 focus:ring-orange-500"
-                            }`}
+                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.phone
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-orange-500"
+                              }`}
                             placeholder="10-digit mobile number"
                           />
                           {errors.phone && (
@@ -496,11 +538,10 @@ function App() {
                             name="firstName"
                             value={formData.firstName}
                             onChange={handleInputChange}
-                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.firstName
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-gray-300 focus:ring-orange-500"
-                            }`}
+                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.firstName
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-orange-500"
+                              }`}
                             placeholder="First Name"
                           />
                           {errors.firstName && (
@@ -518,11 +559,10 @@ function App() {
                             name="lastName"
                             value={formData.lastName}
                             onChange={handleInputChange}
-                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.lastName
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-gray-300 focus:ring-orange-500"
-                            }`}
+                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.lastName
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-orange-500"
+                              }`}
                             placeholder="Last Name"
                           />
                           {errors.lastName && (
@@ -542,11 +582,10 @@ function App() {
                             name="address"
                             value={formData.address}
                             onChange={handleInputChange}
-                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                              errors.address
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-gray-300 focus:ring-orange-500"
-                            }`}
+                            className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.address
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-orange-500"
+                              }`}
                             placeholder="House No., Building Name, Street Name, Area"
                             rows={2}
                           />
@@ -596,11 +635,10 @@ function App() {
                               name="city"
                               value={formData.city}
                               onChange={handleInputChange}
-                              className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                errors.city
-                                  ? "border-red-500 focus:ring-red-500"
-                                  : "border-gray-300 focus:ring-orange-500"
-                              }`}
+                              className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.city
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-orange-500"
+                                }`}
                               placeholder="City"
                             />
                             {errors.city && (
@@ -618,11 +656,10 @@ function App() {
                               name="zipCode"
                               value={formData.zipCode}
                               onChange={handleInputChange}
-                              className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                errors.zipCode
-                                  ? "border-red-500 focus:ring-red-500"
-                                  : "border-gray-300 focus:ring-orange-500"
-                              }`}
+                              className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.zipCode
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-orange-500"
+                                }`}
                               placeholder="Pincode"
                             />
                             {errors.zipCode && (
@@ -672,87 +709,7 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Order Summary Tab */}
-                  <div className="vertical-tab">
-                    <div
-                      className={`tab-header ${activeTab === "summary" ? "active" : activeTab === "payment" ? "completed" : ""}`}
-                      onClick={() =>
-                        validateTab("delivery") && changeTab("summary")
-                      }
-                    >
-                      <div className="tab-number">
-                        {activeTab === "payment" ? "✓" : "3"}
-                      </div>
-                      <div className="tab-title">Order Summary</div>
-                      {activeTab === "payment" && (
-                        <div className="tab-action">
-                          {cartItems.length} items
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              changeTab("summary");
-                            }}
-                            className="ml-2 text-orange-500 underline"
-                          >
-                            Change
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <div
-                      className={`tab-content ${activeTab === "summary" ? "active" : ""}`}
-                    >
-                      <div className="border-t border-gray-200 pt-3">
-                        {cartItems.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex py-3 border-b border-gray-100"
-                          >
-                            <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
-                              <span className="text-2xl">📦</span>
-                            </div>
-                            <div className="flex-1">
-                              <div className="text-sm">{item.name}</div>
-                              <div className="flex items-center text-sm mt-1">
-                                <span className="text-gray-800 font-medium">
-                                  ${item.price.toFixed(2)}
-                                </span>
-                                <span className="text-gray-500 line-through text-xs ml-2">
-                                  ${item.originalPrice.toFixed(2)}
-                                </span>
-                                <span className="text-green-600 text-xs ml-2">
-                                  {Math.round(
-                                    (1 - item.price / item.originalPrice) * 100,
-                                  )}
-                                  % off
-                                </span>
-                              </div>
-                              <div className="flex items-center mt-2">
-                                <span className="text-sm text-gray-600">
-                                  Qty: {item.quantity}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
 
-                      <div className="flex justify-between mt-6">
-                        <button
-                          onClick={() => changeTab("delivery")}
-                          className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
-                        >
-                          BACK
-                        </button>
-                        <button
-                          onClick={() => changeTab("payment")}
-                          className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
-                        >
-                          CONTINUE
-                        </button>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Payment Options Tab */}
                   <div className="vertical-tab">
@@ -773,7 +730,7 @@ function App() {
                           Complete payment in: 00:15:00
                         </div>
                       )}
-
+                      {/* 
                       <div className="space-y-3 mb-6">
                         <div className="border border-gray-300 rounded p-3 flex items-center">
                           <input
@@ -879,11 +836,10 @@ function App() {
                                 name="cardNumber"
                                 value={formData.cardNumber}
                                 onChange={handleInputChange}
-                                className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                  errors.cardNumber
-                                    ? "border-red-500 focus:ring-red-500"
-                                    : "border-gray-300 focus:ring-orange-500"
-                                }`}
+                                className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.cardNumber
+                                  ? "border-red-500 focus:ring-red-500"
+                                  : "border-gray-300 focus:ring-orange-500"
+                                  }`}
                                 placeholder="Card Number"
                                 maxLength={19}
                               />
@@ -903,11 +859,10 @@ function App() {
                                 name="cardholderName"
                                 value={formData.cardholderName}
                                 onChange={handleInputChange}
-                                className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                  errors.cardholderName
-                                    ? "border-red-500 focus:ring-red-500"
-                                    : "border-gray-300 focus:ring-orange-500"
-                                }`}
+                                className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.cardholderName
+                                  ? "border-red-500 focus:ring-red-500"
+                                  : "border-gray-300 focus:ring-orange-500"
+                                  }`}
                                 placeholder="Name on Card"
                               />
                               {errors.cardholderName && (
@@ -927,11 +882,10 @@ function App() {
                                   name="expiryDate"
                                   value={formData.expiryDate}
                                   onChange={handleInputChange}
-                                  className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                    errors.expiryDate
-                                      ? "border-red-500 focus:ring-red-500"
-                                      : "border-gray-300 focus:ring-orange-500"
-                                  }`}
+                                  className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.expiryDate
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-gray-300 focus:ring-orange-500"
+                                    }`}
                                   placeholder="MM/YY"
                                   maxLength={5}
                                 />
@@ -950,11 +904,10 @@ function App() {
                                   name="cvv"
                                   value={formData.cvv}
                                   onChange={handleInputChange}
-                                  className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${
-                                    errors.cvv
-                                      ? "border-red-500 focus:ring-red-500"
-                                      : "border-gray-300 focus:ring-orange-500"
-                                  }`}
+                                  className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.cvv
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-gray-300 focus:ring-orange-500"
+                                    }`}
                                   placeholder="CVV"
                                   maxLength={4}
                                 />
@@ -967,7 +920,7 @@ function App() {
                             </div>
                           </div>
                         </div>
-                      )}
+                      )} */}
 
                       <div className="flex justify-between">
                         <button
@@ -999,143 +952,170 @@ function App() {
             </div>
           </div>
 
-          {/* Right Column - Order Summary */}
+          {/* Right Column - Price Details and Coupon */}
           <div className="w-full lg:w-1/3 hidden lg:block">
-            {/* Price Details */}
+            {/* Price Details and Coupon Section */}
             <div className="bg-white p-4 shadow-sm mb-4">
               <h3 className="text-lg font-medium text-gray-800 mb-3">
                 PRICE DETAILS
               </h3>
               <div className="border-t border-gray-200 pt-3 space-y-3">
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm md:text-base">
                   <span>
                     Price ({cartItems.length} item
                     {cartItems.length !== 1 ? "s" : ""})
                   </span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm md:text-base">
                   <span>Delivery Charges</span>
                   <span className={isFreeShipping ? "text-green-600" : ""}>
                     {isFreeShipping ? "FREE" : `$${shipping.toFixed(2)}`}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm md:text-base">
                   <span>Platform Fee</span>
                   <span>${platformFee.toFixed(2)}</span>
                 </div>
 
-                {/* Coupon Code Section - Now on the right side */}
-                {!couponApplied ? (
-                  <div className="flex flex-col mt-2">
-                    <div className="flex items-center mb-2">
-                      <div className="text-orange-500 mr-2">🏷️</div>
-                      <h3 className="text-sm font-medium text-gray-800">
-                        APPLY COUPON
-                      </h3>
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Enter coupon code"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-orange-500"
-                    />
-                    <button
-                      onClick={applyCoupon}
-                      className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 mt-2"
-                    >
-                      APPLY
-                    </button>
-                    <div className="text-xs text-gray-500 mt-2">
-                      Try: SAVE10, FREESHIP, BONZI25
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between bg-green-50 p-3 rounded">
-                    <div>
-                      <div className="text-green-700 font-medium">
-                        {couponCode.toUpperCase()}
-                      </div>
-                      <div className="text-green-600 text-sm">
-                        ${couponDiscount.toFixed(2)} discount applied
-                      </div>
-                    </div>
-                    <button
-                      onClick={removeCoupon}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
+
+
                 {couponApplied && (
-                  <div className="flex justify-between text-green-600">
+                  <div className="flex justify-between text-green-600 text-sm md:text-base">
                     <span>Coupon Discount</span>
                     <span>-${couponDiscount.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="border-t border-gray-200 pt-3 font-medium flex justify-between">
+                <div className="border-t border-gray-200 pt-3 font-medium flex justify-between text-sm md:text-base">
                   <span>Total Payable</span>
                   <span>${total.toFixed(2)}</span>
                 </div>
-                <div className="text-green-600 border-t border-gray-200 pt-3">
+                <div className="text-green-600 text-sm border-t border-gray-200 pt-3">
                   Your Total Savings on this order ${totalSavings.toFixed(2)}
                 </div>
               </div>
             </div>
 
-            {/* Order Items - Show on all steps */}
-            <div className="bg-white p-4 shadow-sm mb-4">
-              <h3 className="text-lg font-medium text-gray-800 mb-3">
-                ORDER SUMMARY
-              </h3>
-              <div className="border-t border-gray-200 pt-3">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex py-3 border-b border-gray-100"
-                  >
-                    <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mr-3">
-                      <span className="text-2xl">📦</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm">{item.name}</div>
-                      <div className="flex items-center text-sm mt-1">
-                        <span className="text-gray-800 font-medium">
-                          ${item.price.toFixed(2)}
-                        </span>
-                        <span className="text-gray-500 line-through text-xs ml-2">
-                          ${item.originalPrice.toFixed(2)}
-                        </span>
-                        <span className="text-green-600 text-xs ml-2">
-                          {Math.round(
-                            (1 - item.price / item.originalPrice) * 100,
-                          )}
-                          % off
-                        </span>
-                      </div>
-                      <div className="flex items-center mt-2">
-                        <span className="text-sm text-gray-600">
-                          Qty: {item.quantity}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Security Notice */}
             <div className="bg-white p-4 shadow-sm">
-              <div className="flex items-start">
-                <div className="mr-3 text-green-600">🔒</div>
-                <div>
-                  <p className="text-sm text-gray-800">
-                    Safe and Secure Payments. Easy returns. 100% Authentic
-                    products.
-                  </p>
-                </div>
+              {/* Coupon Code Section */}
+              <div className="border-t border-gray-200 pt-3">
+
+                {!couponApplied ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <div className="text-orange-500 mr-2">🏷️</div>
+                      <h3 className="text-sm font-medium text-gray-800">
+                        APPLY COUPON
+                      </h3>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Enter coupon code"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-500"
+                      />
+                      <button
+                        onClick={applyCoupon}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-orange-500 text-sm font-medium hover:text-orange-600"
+                      >
+                        APPLY
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="border border-gray-200 rounded-lg divide-y">
+                        <div
+                          className="p-3 cursor-pointer hover:bg-gray-50 flex items-center"
+                          onClick={() => {
+                            setCouponCode('MMTSECURE');
+                            applyCoupon();
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            checked={couponCode === 'MMTSECURE'}
+                            onChange={() => {
+                              setCouponCode('MMTSECURE');
+                              applyCoupon();
+                            }}
+                            className="mr-3"
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">MMTSECURE</div>
+                            <div className="text-xs text-gray-500">Get an instant discount of $10 on your order</div>
+                          </div>
+                          <div className="text-orange-500 text-sm">$10 OFF</div>
+                        </div>
+                        <div
+                          className="p-3 cursor-pointer hover:bg-gray-50 flex items-center"
+                          onClick={() => {
+                            setCouponCode('MMTRBLEMI');
+                            applyCoupon();
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            checked={couponCode === 'MMTRBLEMI'}
+                            onChange={() => {
+                              setCouponCode('MMTRBLEMI');
+                              applyCoupon();
+                            }}
+                            className="mr-3"
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">MMTRBLEMI</div>
+                            <div className="text-xs text-gray-500">Get $15 instant discount on your RBL Bank Credit Card NC EMI</div>
+                          </div>
+                          <div className="text-orange-500 text-sm">$15 OFF</div>
+                        </div>
+                        <div
+                          className="p-3 cursor-pointer hover:bg-gray-50 flex items-center"
+                          onClick={() => {
+                            setCouponCode('MMTSUPER');
+                            applyCoupon();
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            checked={couponCode === 'MMTSUPER'}
+                            onChange={() => {
+                              setCouponCode('MMTSUPER');
+                              applyCoupon();
+                            }}
+                            className="mr-3"
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">MMTSUPER</div>
+                            <div className="text-xs text-gray-500">Get up to $20 instant discount on your booking</div>
+                          </div>
+                          <div className="text-orange-500 text-sm">$20 OFF</div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-green-50 p-3 rounded">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-green-700 font-medium text-sm">
+                          {couponCode.toUpperCase()}
+                        </div>
+                        <div className="text-green-600 text-xs">
+                          ${couponDiscount.toFixed(2)} discount applied
+                        </div>
+                      </div>
+                      <button
+                        onClick={removeCoupon}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
