@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [activeTab, setActiveTab] = useState("contact");
+  const [activeTab, setActiveTab] = useState("summary"); // Keep summary as default
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [formData, setFormData] = useState({
@@ -143,21 +142,6 @@ function App() {
         newErrors.zipCode = "ZIP code must be 5 digits";
     }
 
-    /*  if (tab === "payment" && formData.paymentMethod === "card") {
-       if (!formData.cardNumber)
-         newErrors.cardNumber = "Card number is required";
-       else if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, "")))
-         newErrors.cardNumber = "Invalid card number";
-       if (!formData.expiryDate)
-         newErrors.expiryDate = "Expiry date is required";
-       else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiryDate))
-         newErrors.expiryDate = "Invalid format (MM/YY)";
-       if (!formData.cvv) newErrors.cvv = "CVV is required";
-       else if (!/^\d{3,4}$/.test(formData.cvv)) newErrors.cvv = "Invalid CVV";
-       if (!formData.cardholderName)
-         newErrors.cardholderName = "Cardholder name is required";
-     } */
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -210,10 +194,12 @@ function App() {
   const changeTab = (tab: string) => {
     const currentTab = activeTab;
 
-    // Validate current tab before changing
-    if (validateTab(currentTab)) {
-      setActiveTab(tab);
+    // Validate current tab before changing (except for summary which doesn't need validation)
+    if (currentTab !== "summary" && !validateTab(currentTab)) {
+      return;
     }
+
+    setActiveTab(tab);
   };
 
   const placeOrder = async () => {
@@ -266,25 +252,21 @@ function App() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Column - Order Summary and Checkout Process */}
           <div className="w-full lg:w-2/3">
-
-
             {/* Checkout Process */}
             <div className="bg-white shadow-sm rounded mb-4">
               <div className="checkout-container">
                 <div className="vertical-tabs">
-                  {/* Order Summary Tab */}
+                  {/* Order Summary Tab - Now First */}
                   <div className="vertical-tab">
                     <div
-                      className={`tab-header ${activeTab === "summary" ? "active" : activeTab === "payment" ? "completed" : ""}`}
-                      onClick={() =>
-                        validateTab("delivery") && changeTab("summary")
-                      }
+                      className={`tab-header ${activeTab === "summary" ? "active" : activeTab === "contact" || activeTab === "delivery" || activeTab === "payment" ? "completed" : ""}`}
+                      onClick={() => changeTab("summary")}
                     >
                       <div className="tab-number">
-                        {activeTab === "payment" ? "✓" : "3"}
+                        {activeTab === "contact" || activeTab === "delivery" || activeTab === "payment" ? "✓" : "1"}
                       </div>
                       <div className="tab-title">Order Summary</div>
-                      {activeTab === "payment" && (
+                      {(activeTab === "contact" || activeTab === "delivery" || activeTab === "payment") && (
                         <div className="tab-action">
                           {cartItems.length} items
                           <button
@@ -335,15 +317,9 @@ function App() {
                         ))}
                       </div>
 
-                      <div className="flex justify-between mt-6">
+                      <div className="flex justify-end mt-6">
                         <button
-                          onClick={() => changeTab("delivery")}
-                          className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
-                        >
-                          BACK
-                        </button>
-                        <button
-                          onClick={() => changeTab("payment")}
+                          onClick={() => changeTab("contact")}
                           className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
                         >
                           CONTINUE
@@ -351,23 +327,18 @@ function App() {
                       </div>
                     </div>
                   </div>
-                  {/* Contact Information Tab */}
+
+                  {/* Contact Information Tab - Now Second */}
                   <div className="vertical-tab">
                     <div
-                      className={`tab-header ${activeTab === "contact" ? "active" : activeTab === "delivery" || activeTab === "summary" || activeTab === "payment" ? "completed" : ""}`}
+                      className={`tab-header ${activeTab === "contact" ? "active" : activeTab === "delivery" || activeTab === "payment" ? "completed" : ""}`}
                       onClick={() => changeTab("contact")}
                     >
                       <div className="tab-number">
-                        {activeTab === "delivery" ||
-                          activeTab === "summary" ||
-                          activeTab === "payment"
-                          ? "✓"
-                          : "1"}
+                        {activeTab === "delivery" || activeTab === "payment" ? "✓" : "2"}
                       </div>
                       <div className="tab-title">Contact Information</div>
-                      {(activeTab === "delivery" ||
-                        activeTab === "summary" ||
-                        activeTab === "payment") &&
+                      {(activeTab === "delivery" || activeTab === "payment") &&
                         formData.email && (
                           <div className="tab-action">
                             {formData.email}
@@ -477,7 +448,13 @@ function App() {
                           )}
                         </div>
                       </div>
-                      <div className="flex justify-end mt-6">
+                      <div className="flex justify-between mt-6">
+                        <button
+                          onClick={() => changeTab("summary")}
+                          className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
+                        >
+                          BACK
+                        </button>
                         <button
                           onClick={() => changeTab("delivery")}
                           className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
@@ -488,35 +465,30 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Delivery Address Tab */}
+                  {/* Delivery Address Tab - Now Third */}
                   <div className="vertical-tab">
                     <div
-                      className={`tab-header ${activeTab === "delivery" ? "active" : activeTab === "summary" || activeTab === "payment" ? "completed" : ""}`}
-                      onClick={() =>
-                        validateTab("contact") && changeTab("delivery")
-                      }
+                      className={`tab-header ${activeTab === "delivery" ? "active" : activeTab === "payment" ? "completed" : ""}`}
+                      onClick={() => validateTab("contact") && changeTab("delivery")}
                     >
                       <div className="tab-number">
-                        {activeTab === "summary" || activeTab === "payment"
-                          ? "✓"
-                          : "2"}
+                        {activeTab === "payment" ? "✓" : "3"}
                       </div>
                       <div className="tab-title">Delivery Address</div>
-                      {(activeTab === "summary" || activeTab === "payment") &&
-                        formData.firstName && (
-                          <div className="tab-action">
-                            {formData.firstName} {formData.lastName}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                changeTab("delivery");
-                              }}
-                              className="ml-2 text-orange-500 underline"
-                            >
-                              Change
-                            </button>
-                          </div>
-                        )}
+                      {activeTab === "payment" && formData.firstName && (
+                        <div className="tab-action">
+                          {formData.firstName} {formData.lastName}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              changeTab("delivery");
+                            }}
+                            className="ml-2 text-orange-500 underline"
+                          >
+                            Change
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <div
                       className={`tab-content ${activeTab === "delivery" ? "active" : ""}`}
@@ -700,7 +672,7 @@ function App() {
                           BACK
                         </button>
                         <button
-                          onClick={() => changeTab("summary")}
+                          onClick={() => changeTab("payment")}
                           className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 focus:outline-none"
                         >
                           CONTINUE
@@ -709,15 +681,11 @@ function App() {
                     </div>
                   </div>
 
-
-
-                  {/* Payment Options Tab */}
+                  {/* Payment Options Tab - Now Fourth */}
                   <div className="vertical-tab">
                     <div
                       className={`tab-header ${activeTab === "payment" ? "active" : ""}`}
-                      onClick={() =>
-                        validateTab("summary") && changeTab("payment")
-                      }
+                      onClick={() => validateTab("delivery") && changeTab("payment")}
                     >
                       <div className="tab-number">4</div>
                       <div className="tab-title">Payment Options</div>
@@ -730,201 +698,10 @@ function App() {
                           Complete payment in: 00:15:00
                         </div>
                       )}
-                      {/* 
-                      <div className="space-y-3 mb-6">
-                        <div className="border border-gray-300 rounded p-3 flex items-center">
-                          <input
-                            type="radio"
-                            id="payment_upi"
-                            name="paymentMethod"
-                            value="upi"
-                            checked={formData.paymentMethod === "upi"}
-                            onChange={() =>
-                              setFormData({ ...formData, paymentMethod: "upi" })
-                            }
-                            className="mr-3"
-                          />
-                          <label htmlFor="payment_upi" className="flex-1">
-                            <div className="font-medium">UPI</div>
-                            <div className="text-sm text-gray-500">
-                              Pay using UPI Apps
-                            </div>
-                          </label>
-                        </div>
-
-                        <div className="border border-gray-300 rounded p-3 flex items-center">
-                          <input
-                            type="radio"
-                            id="payment_card"
-                            name="paymentMethod"
-                            value="card"
-                            checked={formData.paymentMethod === "card"}
-                            onChange={() =>
-                              setFormData({
-                                ...formData,
-                                paymentMethod: "card",
-                              })
-                            }
-                            className="mr-3"
-                          />
-                          <label htmlFor="payment_card" className="flex-1">
-                            <div className="font-medium">
-                              Credit / Debit / ATM Card
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              Add and secure cards as per guidelines
-                            </div>
-                          </label>
-                        </div>
-
-                        <div className="border border-gray-300 rounded p-3 flex items-center">
-                          <input
-                            type="radio"
-                            id="payment_netbanking"
-                            name="paymentMethod"
-                            value="netbanking"
-                            checked={formData.paymentMethod === "netbanking"}
-                            onChange={() =>
-                              setFormData({
-                                ...formData,
-                                paymentMethod: "netbanking",
-                              })
-                            }
-                            className="mr-3"
-                          />
-                          <label
-                            htmlFor="payment_netbanking"
-                            className="flex-1"
-                          >
-                            <div className="font-medium">Net Banking</div>
-                            <div className="text-sm text-gray-500">
-                              Pay through your bank account
-                            </div>
-                          </label>
-                        </div>
-
-                        <div className="border border-gray-300 rounded p-3 flex items-center">
-                          <input
-                            type="radio"
-                            id="payment_cod"
-                            name="paymentMethod"
-                            value="cod"
-                            checked={formData.paymentMethod === "cod"}
-                            onChange={() =>
-                              setFormData({ ...formData, paymentMethod: "cod" })
-                            }
-                            className="mr-3"
-                          />
-                          <label htmlFor="payment_cod" className="flex-1">
-                            <div className="font-medium">Cash on Delivery</div>
-                            <div className="text-sm text-gray-500">
-                              Pay when you receive your order
-                            </div>
-                          </label>
-                        </div>
-                      </div>
-
-                      {formData.paymentMethod === "card" && (
-                        <div className="border border-gray-200 rounded p-4 mb-6 bg-gray-50">
-                          <div className="space-y-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Card Number *
-                              </label>
-                              <input
-                                type="text"
-                                name="cardNumber"
-                                value={formData.cardNumber}
-                                onChange={handleInputChange}
-                                className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.cardNumber
-                                  ? "border-red-500 focus:ring-red-500"
-                                  : "border-gray-300 focus:ring-orange-500"
-                                  }`}
-                                placeholder="Card Number"
-                                maxLength={19}
-                              />
-                              {errors.cardNumber && (
-                                <p className="mt-1 text-sm text-red-600">
-                                  {errors.cardNumber}
-                                </p>
-                              )}
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Name on Card *
-                              </label>
-                              <input
-                                type="text"
-                                name="cardholderName"
-                                value={formData.cardholderName}
-                                onChange={handleInputChange}
-                                className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.cardholderName
-                                  ? "border-red-500 focus:ring-red-500"
-                                  : "border-gray-300 focus:ring-orange-500"
-                                  }`}
-                                placeholder="Name on Card"
-                              />
-                              {errors.cardholderName && (
-                                <p className="mt-1 text-sm text-red-600">
-                                  {errors.cardholderName}
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Expiry Date *
-                                </label>
-                                <input
-                                  type="text"
-                                  name="expiryDate"
-                                  value={formData.expiryDate}
-                                  onChange={handleInputChange}
-                                  className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.expiryDate
-                                    ? "border-red-500 focus:ring-red-500"
-                                    : "border-gray-300 focus:ring-orange-500"
-                                    }`}
-                                  placeholder="MM/YY"
-                                  maxLength={5}
-                                />
-                                {errors.expiryDate && (
-                                  <p className="mt-1 text-sm text-red-600">
-                                    {errors.expiryDate}
-                                  </p>
-                                )}
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  CVV *
-                                </label>
-                                <input
-                                  type="text"
-                                  name="cvv"
-                                  value={formData.cvv}
-                                  onChange={handleInputChange}
-                                  className={`w-full p-2 border rounded focus:outline-none focus:ring-1 ${errors.cvv
-                                    ? "border-red-500 focus:ring-red-500"
-                                    : "border-gray-300 focus:ring-orange-500"
-                                    }`}
-                                  placeholder="CVV"
-                                  maxLength={4}
-                                />
-                                {errors.cvv && (
-                                  <p className="mt-1 text-sm text-red-600">
-                                    {errors.cvv}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )} */}
 
                       <div className="flex justify-between">
                         <button
-                          onClick={() => changeTab("summary")}
+                          onClick={() => changeTab("delivery")}
                           className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
                         >
                           BACK
@@ -951,7 +728,6 @@ function App() {
               )}
             </div>
           </div>
-
           {/* Right Column - Price Details and Coupon */}
           <div className="w-full lg:w-1/3 hidden lg:block">
             {/* Price Details and Coupon Section */}
